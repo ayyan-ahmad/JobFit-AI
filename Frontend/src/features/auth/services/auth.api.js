@@ -38,6 +38,7 @@ export async function loginUser({ email, password }) {
     return response.data
   } catch (error) {
     console.error("Error logging in user:", error)
+    throw error
   }
 
 
@@ -59,4 +60,4 @@ export async function getMe() {
     return response.data
   } catch (error) {
   }
-}
+}   

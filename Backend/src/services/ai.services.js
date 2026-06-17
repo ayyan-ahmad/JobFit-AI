@@ -3,6 +3,7 @@ const { z } = require("zod")
 const { zodToJsonSchema } = require("zod-to-json-schema")
 const puppeteer = require("puppeteer")
 
+
 const ai = new GoogleGenAI({
     apiKey: process.env.GOOGLE_GENAI_API_KEY
 })
@@ -107,9 +108,9 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
 
     const jsonContent = JSON.parse(response.text)
 
-    // const pdfBuffer = await generatePdfFromHtml(jsonContent.html)
+    const pdfBuffer = await generatePdfFromHtml(jsonContent.html)
 
-    // return pdfBuffer
+    return pdfBuffer
 
 }
 
