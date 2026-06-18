@@ -47,6 +47,22 @@ async function generateInterViewReportController(req, res) {
         })
     } catch (error) {
         console.error("Error in generateInterViewReportController:", error)
+
+        // Detect Gemini API rate limit (429) errors
+        const isRateLimit =
+            error?.status === 429 ||
+            error?.code === 429 ||
+            (typeof error?.message === "string" && error.message.toLowerCase().includes("rate limit")) ||
+            (typeof error?.message === "string" && error.message.toLowerCase().includes("quota")) ||
+            (typeof error?.message === "string" && error.message.toLowerCase().includes("resource_exhausted"))
+
+        if (isRateLimit) {
+            return res.status(429).json({
+                message: "AI limit reached. Please wait a moment and try again.",
+                error: "rate_limit"
+            })
+        }
+
         res.status(500).json({
             message: "Failed to generate interview report.",
             error: error.message
