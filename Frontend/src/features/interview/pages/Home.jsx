@@ -7,14 +7,21 @@ const Home = () => {
     const { loading, generateReport, reports } = useInterview()
     const [jobDescription, setJobDescription] = useState("")
     const [selfDescription, setSelfDescription] = useState("")
+    const [error, setError] = useState(null)
     const resumeInputRef = useRef()
 
     const navigate = useNavigate()
 
     const handleGenerateReport = async () => {
-        const resumeFile = resumeInputRef.current.files[0]
-        const data = await generateReport({ jobDescription, selfDescription, resumeFile })
-        navigate(`/interview/${data._id}`)
+        setError(null)
+        try {
+            const resumeFile = resumeInputRef.current.files[0]
+            const data = await generateReport({ jobDescription, selfDescription, resumeFile })
+            navigate(`/interview/${data._id}`)
+        } catch (err) {
+            const msg = err?.response?.data?.error || err?.response?.data?.message || err?.message || "Something went wrong. Please try again."
+            setError(msg)
+        }
     }
 
     if (loading) {
@@ -140,12 +147,19 @@ const Home = () => {
                             <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse" />
                             AI-Powered Strategy Generation &bull; Approx 30s
                         </span>
-                        <button
-                            onClick={handleGenerateReport}
-                            className="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/10 hover:shadow-indigo-500/20 transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 group">
-                            <Sparkles className="w-3.5 h-3.5 text-indigo-200 group-hover:scale-110 transition-transform" />
-                            Generate My Interview Strategy
-                        </button>
+                        <div className="flex flex-col items-end gap-2 w-full sm:w-auto">
+                            {error && (
+                                <p className="text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg px-3 py-2 text-right max-w-sm">
+                                    ⚠️ {error}
+                                </p>
+                            )}
+                            <button
+                                onClick={handleGenerateReport}
+                                className="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/10 hover:shadow-indigo-500/20 transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 group">
+                                <Sparkles className="w-3.5 h-3.5 text-indigo-200 group-hover:scale-110 transition-transform" />
+                                Generate My Interview Strategy
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -165,13 +179,12 @@ const Home = () => {
                                     </div>
                                     <div className="flex items-center justify-between pt-2 border-t border-white/[0.04]">
                                         <span className="text-[11px] text-gray-400">Match Accuracy</span>
-                                        <span className={`text-xs font-bold font-mono px-2 py-0.5 rounded ${
-                                            report.matchScore >= 80
+                                        <span className={`text-xs font-bold font-mono px-2 py-0.5 rounded ${report.matchScore >= 80
                                                 ? 'text-emerald-400 bg-emerald-500/5 border border-emerald-500/10'
                                                 : report.matchScore >= 60
                                                     ? 'text-amber-400 bg-amber-500/5 border border-amber-500/10'
                                                     : 'text-rose-400 bg-rose-500/5 border border-rose-500/10'
-                                        }`}>
+                                            }`}>
                                             {report.matchScore}%
                                         </span>
                                     </div>
