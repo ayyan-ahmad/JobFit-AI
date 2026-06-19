@@ -21,7 +21,7 @@ async function registerUserController(req, res) {
     }
 
     const isUserAlreadyExists = await userModel.findOne({
-        $or: [ { username }, { email } ]
+        $or: [{ username }, { email }]
     })
 
     if (isUserAlreadyExists) {
@@ -97,7 +97,7 @@ async function loginUserController(req, res) {
             id: user._id,
             username: user.username,
             email: user.email
-        }  
+        }
     })
 }
 
@@ -110,9 +110,9 @@ async function loginUserController(req, res) {
 async function logoutUserController(req, res) {
     const token = req.cookies.token
 
-     if (token) {
-         await tokenBlacklistModel.create({ token })
- }
+    if (token) {
+        await tokenBlacklistModel.create({ token })
+    }
 
     res.clearCookie("token")
 
@@ -130,7 +130,11 @@ async function getMeController(req, res) {
 
     const user = await userModel.findById(req.user.id)
 
-
+    if (!user) {
+        return res.status(404).json({
+            message: "User not found"
+        })
+    }
 
     res.status(200).json({
         message: "User details fetched successfully",
