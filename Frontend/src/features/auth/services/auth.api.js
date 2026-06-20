@@ -5,7 +5,7 @@ const API_BASE_URL = axios.create({
   withCredentials: true
 })
 
-// Interceptor — har request mein localStorage token header mein add karo
+// Request Interceptor — har request mein localStorage token header mein add karo
 API_BASE_URL.interceptors.request.use((config) => {
   const token = localStorage.getItem("token")
   if (token) {
@@ -13,6 +13,19 @@ API_BASE_URL.interceptors.request.use((config) => {
   }
   return config
 })
+
+// Response Interceptor — agar 401 aaye toh token clear karo
+API_BASE_URL.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token")
+      // Storage event manually trigger karo (same tab ke liye)
+      window.dispatchEvent(new StorageEvent("storage", { key: "token", newValue: null }))
+    }
+    return Promise.reject(error)
+  }
+)
 
 export async function registerUser({ username, email, password }) {
   try {

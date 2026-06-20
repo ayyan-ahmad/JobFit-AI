@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useCallback } from "react";
 import { loginUser, registerUser, logoutUser, getMe } from "./services/auth.api";
 
 export const AuthContext = createContext();
@@ -7,22 +7,52 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const getAndSetUser = async () => {
-            try {
-                const data = await getMe();
-                if (data && data.user) {
-                    setUser(data.user);
-                }
-            } catch (err) {
-                console.error("Error fetching user session:", err);
-            } finally {
-                setLoading(false);
+    // Token verify karo — agar nahi mila toh user null kar do
+    const verifyAndSetUser = useCallback(async () => {
+        const token = localStorage.getItem("token")
+        if (!token) {
+            setUser(null)
+            setLoading(false)
+            return
+        }
+        try {
+            const data = await getMe();
+            if (data && data.user) {
+                setUser(data.user);
+            } else {
+                // getMe failed — token invalid, user logout
+                localStorage.removeItem("token")
+                setUser(null)
             }
-        };
+        } catch (err) {
+            localStorage.removeItem("token")
+            setUser(null)
+        } finally {
+            setLoading(false);
+        }
+    }, [])
 
-        getAndSetUser();
-    }, []);
+    // App start hone pe verify karo
+    useEffect(() => {
+        verifyAndSetUser();
+    }, [verifyAndSetUser]);
+
+    // Jab bhi localStorage change ho (token delete) — re-verify karo
+    useEffect(() => {
+        const handleStorageChange = (e) => {
+            if (e.key === "token") {
+                if (!e.newValue) {
+                    // Token delete hua — user logout
+                    setUser(null)
+                } else {
+                    // Token change hua — re-verify
+                    verifyAndSetUser()
+                }
+            }
+        }
+        window.addEventListener("storage", handleStorageChange)
+        return () => window.removeEventListener("storage", handleStorageChange)
+    }, [verifyAndSetUser])
 
     const handleLogin = async ({ email, password }) => {
         setLoading(true);
@@ -63,6 +93,7 @@ export const AuthProvider = ({ children }) => {
             setUser(null);
         } catch (err) {
             console.error("Logout failed:", err);
+            setUser(null);
         } finally {
             setLoading(false);
         }
