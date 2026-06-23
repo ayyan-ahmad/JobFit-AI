@@ -2,27 +2,14 @@ import axios from "axios";
 
 const API_BASE_URL = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
-  withCredentials: true
+  withCredentials: true  // Har request ke saath cookies automatically send hongi
 })
 
-// Request Interceptor — har request mein localStorage token header mein add karo
-API_BASE_URL.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token")
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
-
-// Response Interceptor — agar 401 aaye toh token clear karo
+// Response Interceptor — agar 401 aaye toh page reload karo (cookie already clear ho jaati hai server se)
 API_BASE_URL.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("token")
-      // Storage event manually trigger karo (same tab ke liye)
-      window.dispatchEvent(new StorageEvent("storage", { key: "token", newValue: null }))
-    }
+    // 401 pe kuch nahi karna — server ne cookie clear kar di hogi
     return Promise.reject(error)
   }
 )
@@ -33,10 +20,7 @@ export async function registerUser({ username, email, password }) {
       "/api/auth/register",
       { username, email, password }
     );
-    // Token localStorage mein save karo
-    if (response.data?.token) {
-      localStorage.setItem("token", response.data.token)
-    }
+    // Token cookie mein server set karta hai — frontend kuch store nahi karta
     return response.data;
   } catch (error) {
     console.error("Error registering user:", error);
@@ -51,10 +35,7 @@ export async function loginUser({ email, password }) {
       "/api/auth/login",
       { email, password }
     )
-    // Token localStorage mein save karo
-    if (response.data?.token) {
-      localStorage.setItem("token", response.data.token)
-    }
+    // Token cookie mein server set karta hai — frontend kuch store nahi karta
     return response.data
   } catch (error) {
     console.error("Error logging in user:", error)
@@ -66,11 +47,11 @@ export async function loginUser({ email, password }) {
 export async function logoutUser() {
   try {
     const response = await API_BASE_URL.get("/api/auth/logout")
-    // Token localStorage se remove karo
-    localStorage.removeItem("token")
+    // Server ne cookie clear kar di — frontend kuch nahi karta
     return response.data
   } catch (error) {
-    localStorage.removeItem("token")
+    // Logout fail ho toh bhi user ko logout kar do
+    console.error("Logout error:", error)
   }
 }
 
