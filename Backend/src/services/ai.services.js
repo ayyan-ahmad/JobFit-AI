@@ -1,6 +1,5 @@
 const { GoogleGenAI } = require("@google/genai")
-const puppeteer = require("puppeteer-core")
-const chromium = require("@sparticuz/chromium-min")
+const puppeteer = require("puppeteer")
 
 
 const ai = new GoogleGenAI({
@@ -107,10 +106,13 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
 
 async function generatePdfFromHtml(htmlContent) {
     const browser = await puppeteer.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
         headless: true,
+        args: [
+            "--no-sandbox",           // Render (Linux) ke liye zaroori
+            "--disable-setuid-sandbox",
+            "--disable-dev-shm-usage",  // Docker/container mein memory issue fix
+            "--disable-gpu"
+        ],
     });
 
     const page = await browser.newPage();

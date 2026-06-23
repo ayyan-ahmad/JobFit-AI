@@ -25,15 +25,16 @@ app.use(cors({
         }
         return callback(new Error("CORS not allowed for origin: " + origin))
     },
-    credentials: true
+    credentials: true,
+    exposedHeaders: ["Content-Disposition", "Content-Type", "Content-Length"]
 }))
 
 // require all the routes here
 const authRouter = require("./routes/auth.routes");
-const interviewRouter= require("./routes/interview.routes")
+const interviewRouter = require("./routes/interview.routes")
 
 //using all the routes here
-app.use("/api/auth", authRouter); 
+app.use("/api/auth", authRouter);
 app.use("/api/interview", interviewRouter)
 
 
