@@ -31,31 +31,36 @@ export const useInterview = () => {
 
     const getReportById = async (interviewId) => {
         setLoading(true)
-        let response = null
         try {
-            response = await getInterviewReportById(interviewId)
-            setReport(response.interviewReport)
+            const response = await getInterviewReportById(interviewId)
+            if (response) {
+                setReport(response.interviewReport)
+                return response.interviewReport
+            }
+            return null
         } catch (error) {
             console.log(error)
+            return null
         } finally {
             setLoading(false)
         }
-        return response.interviewReport
     }
 
     const getReports = async () => {
         setLoading(true)
-        let response = null
         try {
-            response = await getAllInterviewReports()
-            setReports(response.interviewReports)
+            const response = await getAllInterviewReports()
+            if (response) {
+                setReports(response.interviewReports)
+                return response.interviewReports
+            }
+            return []
         } catch (error) {
             console.log(error)
+            return []
         } finally {
             setLoading(false)
         }
-
-        return response.interviewReports
     }
 
     const getResumePdf = async (interviewReportId) => {
@@ -63,7 +68,7 @@ export const useInterview = () => {
         let response = null
         try {
             response = await generateResumePdf({ interviewReportId })
-            const url = window.URL.createObjectURL(new Blob([ response ], { type: "application/pdf" }))
+            const url = window.URL.createObjectURL(new Blob([response], { type: "application/pdf" }))
             const link = document.createElement("a")
             link.href = url
             link.setAttribute("download", `resume_${interviewReportId}.pdf`)
@@ -83,7 +88,7 @@ export const useInterview = () => {
         } else {
             getReports()
         }
-    }, [ interviewId ])
+    }, [interviewId])
 
     return { loading, report, reports, generateReport, getReportById, getReports, getResumePdf }
 
