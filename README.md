@@ -146,7 +146,6 @@ http://localhost:5173
 ## 🔒 Authentication Flow
 
 - Token stored in **HTTP-only cookie** (auto-sent with requests)
-- Token also stored in **localStorage** as fallback (for cross-site production)
 - Axios interceptor attaches `Authorization: Bearer <token>` on every request
 - Auto-logout on 401 response or token deletion
 
