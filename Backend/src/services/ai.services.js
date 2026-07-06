@@ -1,5 +1,6 @@
 const { GoogleGenAI } = require("@google/genai")
-const puppeteer = require("puppeteer")
+const puppeteer = require("puppeteer-core")
+const chromium = require("@sparticuz/chromium")
 
 
 
@@ -105,8 +106,33 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
 
 
 async function generatePdfFromHtml(htmlContent) {
-    const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] })
-    const page = await browser.newPage();
+    const isProduction = process.env.NODE_ENV === "production"
+
+    let browser
+
+    if (isProduction) {
+        // Render / serverless — use @sparticuz/chromium
+        browser = await puppeteer.launch({
+            args: chromium.args,
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath(),
+            headless: chromium.headless,
+        })
+    } else {
+        // Local dev — use system Chrome directly
+        browser = await puppeteer.launch({
+            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+            args: [
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu"
+            ],
+            headless: true,
+        })
+    }
+
+    const page = await browser.newPage()
     await page.setContent(htmlContent, { waitUntil: "networkidle0" })
 
     const pdfBuffer = await page.pdf({
