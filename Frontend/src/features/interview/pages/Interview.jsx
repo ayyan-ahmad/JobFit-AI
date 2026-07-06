@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate, useParams } from 'react-router'
 // Modern premium icons imported here
@@ -8,10 +8,13 @@ import {
     MessageSquare,
     Map,
     ChevronDown,
-    Download,
     Target,
     AlertCircle,
-    ArrowLeft
+    ArrowLeft,
+    Download,
+    X,
+    CheckCircle,
+    WifiOff
 } from 'lucide-react'
 
 const NAV_ITEMS = [
@@ -19,6 +22,56 @@ const NAV_ITEMS = [
     { id: 'behavioral', label: 'Behavioral Questions', icon: <MessageSquare className="w-4 h-4" /> },
     { id: 'roadmap', label: 'Road Map', icon: <Map className="w-4 h-4" /> },
 ]
+
+// ── Toast Component ────────────────────────────────────────────────────────────
+const Toast = ({ toast, onClose }) => {
+    useEffect(() => {
+        if (!toast) return
+        const t = setTimeout(onClose, 5000)
+        return () => clearTimeout(t)
+    }, [toast])
+
+    if (!toast) return null
+
+    const isError = toast.type === 'error'
+    const isRateLimit = toast.type === 'rate_limit'
+
+    const config = isRateLimit
+        ? { bg: 'bg-amber-500/10 border-amber-500/30', icon: <WifiOff className="w-4 h-4 text-amber-400 shrink-0" />, text: 'text-amber-300' }
+        : isError
+            ? { bg: 'bg-rose-500/10 border-rose-500/30', icon: <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />, text: 'text-rose-300' }
+            : { bg: 'bg-emerald-500/10 border-emerald-500/30', icon: <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />, text: 'text-emerald-300' }
+
+    return (
+        <div
+            className={`fixed bottom-6 right-6 z-50 flex items-start gap-3 px-4 py-3 rounded-xl border backdrop-blur-xl shadow-2xl max-w-sm w-full transition-all duration-300 animate-toast-in ${config.bg}`}
+            style={{ animation: 'slideInRight 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards' }}
+        >
+            {config.icon}
+            <p className={`text-sm font-medium leading-snug flex-1 ${config.text}`}>{toast.message}</p>
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-300 transition-colors shrink-0 mt-0.5">
+                <X className="w-3.5 h-3.5" />
+            </button>
+            {/* Progress bar */}
+            <div className="absolute bottom-0 left-0 h-0.5 rounded-b-xl bg-white/10 w-full overflow-hidden">
+                <div
+                    className="h-full bg-white/30"
+                    style={{ animation: 'shrinkBar 5s linear forwards' }}
+                />
+            </div>
+            <style>{`
+                @keyframes slideInRight {
+                    from { opacity: 0; transform: translateX(60px) scale(0.95); }
+                    to   { opacity: 1; transform: translateX(0)   scale(1); }
+                }
+                @keyframes shrinkBar {
+                    from { width: 100%; }
+                    to   { width: 0%; }
+                }
+            `}</style>
+        </div>
+    )
+}
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 const QuestionCard = ({ item, index }) => {
@@ -84,6 +137,7 @@ const RoadMapDay = ({ day }) => (
 // ── Main Component ────────────────────────────────────────────────────────────
 const Interview = () => {
     const [activeNav, setActiveNav] = useState('technical')
+    const [toast, setToast] = useState(null)
     const { report, getReportById, loading, getResumePdf } = useInterview()
     const { interviewId } = useParams()
     const navigate = useNavigate()
@@ -151,14 +205,33 @@ const Interview = () => {
                             </div>
                         </div>
 
-                        {/* Download Resume Action */}
+                        {/* Download Resume Button */}
                         <button
-                            onClick={() => { getResumePdf(interviewId) }}
-                            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs font-bold text-white rounded-xl transition-all active:scale-[0.98]"
+                            onClick={async () => {
+                                const result = await getResumePdf(interviewId)
+                                if (result?.success === false) {
+                                    const isRateLimit = result.message?.toLowerCase().includes('traffic') ||
+                                        result.message?.toLowerCase().includes('busy') ||
+                                        result.message?.toLowerCase().includes('limit')
+                                    setToast({
+                                        type: isRateLimit ? 'rate_limit' : 'error',
+                                        message: result.message
+                                    })
+                                } else if (result?.success) {
+                                    setToast({ type: 'success', message: 'Resume downloaded successfully!' })
+                                }
+                            }}
+                            disabled={loading}
+                            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs md:text-sm font-semibold transition-all duration-200 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-600/20 disabled:opacity-50 disabled:cursor-not-allowed group"
                         >
-                            <Download className="w-4 h-4 text-indigo-400" />
+                            {loading ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                                <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+                            )}
                             Download Resume
                         </button>
+
                     </nav>
 
                     {/* ── Center Dynamic Content Panel ── */}
@@ -269,6 +342,9 @@ const Interview = () => {
                 </footer>
 
             </div>
+            {/* Toast Notification */}
+            <Toast toast={toast} onClose={() => setToast(null)} />
+
         </div>
     )
 }

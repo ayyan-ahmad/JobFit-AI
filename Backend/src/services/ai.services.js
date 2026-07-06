@@ -2,6 +2,7 @@ const { GoogleGenAI } = require("@google/genai")
 const puppeteer = require("puppeteer")
 
 
+
 const ai = new GoogleGenAI({
     apiKey: process.env.GOOGLE_GENAI_API_KEY
 })
@@ -103,37 +104,25 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
 }
 
 
-
 async function generatePdfFromHtml(htmlContent) {
-    const browser = await puppeteer.launch({
-        headless: true,
-        args: [
-            "--no-sandbox",           // Render (Linux) ke liye zaroori
-            "--disable-setuid-sandbox",
-            "--disable-dev-shm-usage",  // Docker/container mein memory issue fix
-            "--disable-gpu"
-        ],
-    });
-
+    const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] })
     const page = await browser.newPage();
-
-    await page.setContent(htmlContent, {
-        waitUntil: "networkidle0",
-    });
+    await page.setContent(htmlContent, { waitUntil: "networkidle0" })
 
     const pdfBuffer = await page.pdf({
         format: "A4",
         printBackground: true,
         margin: {
-            top: "20mm",
-            bottom: "20mm",
-            left: "15mm",
-            right: "15mm",
-        },
-    });
+            top: "12mm",
+            bottom: "12mm",
+            left: "8mm",
+            right: "15mm"
+        }
+    })
 
-    await browser.close();
-    return pdfBuffer;
+    await browser.close()
+
+    return pdfBuffer
 }
 
 async function generateResumePdf({ resume, selfDescription, jobDescription }) {
@@ -146,18 +135,30 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
         required: ["html"]
     }
 
-    const prompt = `Generate resume for a candidate with the following details:
-                    Resume: ${resume || "Not provided"}
-                    Self Description: ${selfDescription || "Not provided"}
-                    Job Description: ${jobDescription}
+    const prompt = `You are a professional resume writer. Generate a SINGLE-PAGE ATS-friendly resume in pure HTML+CSS.
 
-                    the response should be a JSON object with a single field "html" ...
-                    The resume should not be so lengthy, it should ideally be 1-2 pages long when converted to PDF.
+                    Candidate Details:
+                    - Resume/Experience: ${resume || "Not provided"}
+                    - Self Description: ${selfDescription || "Not provided"}
+                    - Target Job Description: ${jobDescription}
 
-                    The HTML must be designed specifically for an A4-size PDF resume.
-                    Use proper margins and ensure all content fits within 1-2 A4 pages.
-                    Use a clean, professional, ATS-friendly single-column layout.
-                    Include CSS for A4 page size and avoid content overflow.
+                    STRICT REQUIREMENTS:
+                    1. SINGLE PAGE ONLY — absolutely no overflow beyond one A4 page (210mm x 297mm).
+                    2. ATS FRIENDLY — use plain semantic HTML: <h1>, <h2>, <h3>, <p>, <ul>, <li>. NO tables, NO columns, NO flexbox for layout, NO CSS Grid. Single-column only.
+                    3. FONT — use font-family: 'Arial', 'Helvetica', sans-serif. No Google Fonts (no @import).
+                    4. MARGINS — body margin: 0; padding: 0. Content wrapper: padding: 12mm 15mm 12mm 8mm.
+                    5. FONT SIZES — Name: 20px bold; Section headings: 13px bold uppercase with a 1px solid #333 bottom border and 4px margin-bottom; Body text: 11px; Line-height: 1.4.
+                    6. SECTIONS ORDER — Name & Contact Info → Summary → Skills → Experience → Education → (optional: Projects or Certifications if space allows).
+                    7. COLORS — black text (#111) on white (#fff) background. Section heading underline: #333. Subtle only.
+                    8. SPACING — minimize padding/margins to ensure single page. Use margin: 6px 0 between sections.
+                    9. SKILLS — display as comma-separated text in a <p> tag, NOT as pills or badges.
+                    10. EXPERIENCE entries — Role Title | Company | Date (same line), then bullet points as <ul><li>.
+                    11. NO images, icons, SVGs, or decorative elements.
+                    12. Include a <style> block inside <head>. No external stylesheets.
+                    13. The complete document must be a valid full HTML page: <!DOCTYPE html><html><head>...</head><body>...</body></html>.
+
+                    Tailor the resume content specifically to the target job description to maximize ATS keyword match.
+                    Return ONLY the JSON object with field "html" containing the complete HTML string.
                 `
 
 

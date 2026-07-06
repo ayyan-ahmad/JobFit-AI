@@ -62,29 +62,36 @@ export const useInterview = () => {
             setLoading(false)
         }
     }
-
-    const getResumePdf = async (interviewReportId) => {
+ const getResumePdf = async (interviewReportId) => {
         setLoading(true)
+        let response = null
         try {
-            const response = await generateResumePdf({ interviewReportId })
-
-            // Blob URL banao aur download trigger karo
-            const blob = new Blob([response], { type: "application/pdf" })
-            const url = window.URL.createObjectURL(blob)
-
+            response = await generateResumePdf({ interviewReportId })
+            const url = window.URL.createObjectURL(new Blob([response], { type: "application/pdf" }))
             const link = document.createElement("a")
             link.href = url
             link.setAttribute("download", `resume_${interviewReportId}.pdf`)
-            link.style.display = "none"  // page mein visible nahi hoga
             document.body.appendChild(link)
             link.click()
-
-            // Cleanup — memory leak se bachao
-            document.body.removeChild(link)
+            link.remove()
             window.URL.revokeObjectURL(url)
+            return { success: true }
         }
         catch (error) {
-            console.error("PDF download failed:", error)
+            // Axios blob responses need special parsing to extract JSON error
+            let message = "Failed to generate resume PDF. Please try again."
+            try {
+                if (error?.response?.data instanceof Blob) {
+                    const text = await error.response.data.text()
+                    const json = JSON.parse(text)
+                    message = json?.message || message
+                } else if (error?.response?.data?.message) {
+                    message = error.response.data.message
+                }
+            } catch (_) { }
+
+            console.error("Resume PDF error:", message)
+            return { success: false, message }
         } finally {
             setLoading(false)
         }
@@ -96,7 +103,7 @@ export const useInterview = () => {
         } else {
             getReports()
         }
-    }, [interviewId])
+    }, [ interviewId ])
 
     return { loading, report, reports, generateReport, getReportById, getReports, getResumePdf }
 

@@ -1,5 +1,5 @@
 const pdfParse = require("pdf-parse")
-const { generateInterviewReport, generateResumePdf } = require("../services/ai.services")
+const { generateInterviewReport,generateResumePdf } = require("../services/ai.services")
 const interviewReportModel = require("../models/interviewReport.model")
 
 
@@ -104,7 +104,6 @@ async function getAllInterviewReportsController(req, res) {
     })
 }
 
-
 /**
  * @description Controller to generate resume PDF based on user self description, resume and job description.
  */
@@ -126,15 +125,31 @@ async function generateResumePdfController(req, res) {
 
         res.set({
             "Content-Type": "application/pdf",
-            "Content-Disposition": `attachment; filename=resume_${interviewReportId}.pdf`,
-            "Content-Length": pdfBuffer.length
+            "Content-Disposition": `attachment; filename=resume_${interviewReportId}.pdf`
         })
 
         res.send(pdfBuffer)
+
     } catch (error) {
-        console.error("Error generating resume PDF:", error)
+        console.error("Error in generateResumePdfController:", error)
+
+        const isRateLimit =
+            error?.status === 429 ||
+            error?.code === 429 ||
+            (typeof error?.message === "string" && error.message.toLowerCase().includes("rate limit")) ||
+            (typeof error?.message === "string" && error.message.toLowerCase().includes("quota")) ||
+            (typeof error?.message === "string" && error.message.toLowerCase().includes("resource_exhausted")) ||
+            (typeof error?.message === "string" && error.message.toLowerCase().includes("too many requests"))
+
+        if (isRateLimit) {
+            return res.status(429).json({
+                message: "AI is currently busy due to high traffic. Please wait a moment and try again.",
+                error: "rate_limit"
+            })
+        }
+
         res.status(500).json({
-            message: "Failed to generate resume PDF.",
+            message: "Failed to generate resume PDF. Please try again later.",
             error: error.message
         })
     }
