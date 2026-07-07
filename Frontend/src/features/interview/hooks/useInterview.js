@@ -71,34 +71,52 @@ export const useInterview = () => {
 
             const html2pdf = (await import('html2pdf.js')).default
 
-            const element = document.createElement('div')
-            element.innerHTML = html
+            // Parse the full HTML document Gemini returns and extract <style> + <body> content
+            const parser = new DOMParser()
+            const doc = parser.parseFromString(html, 'text/html')
+            const bodyContent = doc.body.innerHTML
+            const styleContent = Array.from(doc.querySelectorAll('style'))
+                .map(s => s.outerHTML).join('')
 
-            // Apply single-page constraints directly to the element
-            element.style.width = '794px'      // A4 width at 96dpi
-            element.style.maxHeight = '1123px' // A4 height at 96dpi
-            element.style.overflow = 'hidden'
-            element.style.boxSizing = 'border-box'
+            // Create a container that is visible but off-screen (html2canvas needs it rendered)
+            const container = document.createElement('div')
+            container.style.cssText = `
+                position: fixed;
+                left: -9999px;
+                top: 0;
+                width: 794px;
+                min-height: 1123px;
+                background: white;
+                z-index: -9999;
+                overflow: hidden;
+            `
+            container.innerHTML = styleContent + bodyContent
+            document.body.appendChild(container)
 
-            document.body.appendChild(element)
+            // Wait for browser to render it
+            await new Promise(resolve => setTimeout(resolve, 300))
 
             await html2pdf().set({
                 margin: 0,
                 filename: `resume_${interviewReportId}.pdf`,
                 image: { type: 'jpeg', quality: 1 },
                 html2canvas: {
-                    scale: 1.5,
+                    scale: 2,
                     useCORS: true,
+                    allowTaint: true,
                     width: 794,
                     height: 1123,
                     windowWidth: 794,
+                    scrollX: 0,
                     scrollY: 0,
+                    backgroundColor: '#ffffff',
+                    logging: false,
                 },
                 jsPDF: { unit: 'px', format: [794, 1123], orientation: 'portrait' },
                 pagebreak: { mode: 'avoid-all' }
-            }).from(element).save()
+            }).from(container).save()
 
-            document.body.removeChild(element)
+            document.body.removeChild(container)
 
             return { success: true }
         }
