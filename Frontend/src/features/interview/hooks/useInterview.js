@@ -1,4 +1,4 @@
-import { getAllInterviewReports, generateInterviewReport, getInterviewReportById, generateResumePdf } from "../services/interview.api"
+import { getAllInterviewReports, generateInterviewReport, getInterviewReportById, generateResumePdf, getMockResults as fetchMockResults, getMockResultById as fetchMockResultById } from "../services/interview.api"
 import { useContext, useEffect } from "react"
 import { InterviewContext } from "../interview.context"
 import { useParams } from "react-router"
@@ -13,7 +13,7 @@ export const useInterview = () => {
         throw new Error("useInterview must be used within an InterviewProvider")
     }
 
-    const { loading, setLoading, report, setReport, reports, setReports } = context
+    const { loading, setLoading, report, setReport, reports, setReports, mockResults, setMockResults } = context
 
     const generateReport = async ({ jobDescription, selfDescription, resumeFile }) => {
         setLoading(true)
@@ -58,6 +58,33 @@ export const useInterview = () => {
         } catch (error) {
             console.log(error)
             return []
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const getMockResultsList = async () => {
+        try {
+            const response = await fetchMockResults()
+            if (response) {
+                setMockResults(response.mockResults)
+                return response.mockResults
+            }
+            return []
+        } catch (error) {
+            console.log('Error fetching mock results:', error)
+            return []
+        }
+    }
+
+    const getMockResultDetail = async (resultId) => {
+        setLoading(true)
+        try {
+            const response = await fetchMockResultById(resultId)
+            return response?.mockResult || null
+        } catch (error) {
+            console.log('Error fetching mock result:', error)
+            return null
         } finally {
             setLoading(false)
         }
@@ -133,9 +160,10 @@ export const useInterview = () => {
             getReportById(interviewId)
         } else {
             getReports()
+            getMockResultsList()
         }
     }, [interviewId])
 
-    return { loading, report, reports, generateReport, getReportById, getReports, getResumePdf }
+    return { loading, report, reports, mockResults, generateReport, getReportById, getReports, getResumePdf, getMockResultsList, getMockResultDetail }
 
 }

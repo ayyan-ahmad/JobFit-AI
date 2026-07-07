@@ -85,7 +85,7 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
 `
 
     const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: {
             responseMimeType: "application/json",
@@ -101,6 +101,72 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
     return JSON.parse(text)
 
 }
+
+/**
+ * @description Service to evaluate user's mock interview answers using Gemini AI.
+ * @param {Array} qnaList - Array of objects containing { question, answer }.
+ */
+const evaluationSchema = {
+    type: "object",
+    properties: {
+        overallScore: {
+            type: "number",
+            description: "Overall score out of 100 for the candidate's interview performance"
+        },
+        overallSummary: {
+            type: "string",
+            description: "A brief overall summary of the candidate's interview performance"
+        },
+        evaluations: {
+            type: "array",
+            description: "Per-question evaluation results",
+            items: {
+                type: "object",
+                properties: {
+                    question: { type: "string", description: "The interview question" },
+                    score: { type: "number", description: "Score for this question out of 10" },
+                    feedback: { type: "string", description: "Detailed feedback on the candidate's answer" },
+                    modelAnswer: { type: "string", description: "A concise ideal answer for this question" }
+                },
+                required: ["question", "score", "feedback", "modelAnswer"]
+            }
+        }
+    },
+    required: ["overallScore", "overallSummary", "evaluations"]
+}
+
+const evaluateInterviewAnswers = async (qnaList) => {
+    const prompt = `
+        You are a strict and expert technical interviewer evaluating a candidate's mock interview performance.
+        Below is the list of questions asked and the exact answers provided by the candidate.
+
+        Candidate's Q&A:
+        ${JSON.stringify(qnaList, null, 2)}
+
+        Evaluate the candidate's performance. For EACH question, provide:
+        1. A score out of 10 (be honest and strict).
+        2. Detailed, constructive feedback on what was good and what was missing or technically wrong.
+        3. A concise ideal model answer for that question.
+
+        Also provide an OVERALL score out of 100 and a brief overall performance summary.
+    `;
+
+    const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: evaluationSchema,
+        }
+    });
+
+    const text = response.text;
+    if (!text) {
+        throw new Error("Empty response from Gemini AI");
+    }
+
+    return JSON.parse(text);
+};
 
 
 async function generateResumePdf({ resume, selfDescription, jobDescription }) {
@@ -144,7 +210,7 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
 
 
     const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: {
             responseMimeType: "application/json",
@@ -159,4 +225,4 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
 
 }
 
-module.exports = { generateInterviewReport, generateResumePdf }
+module.exports = { generateInterviewReport, generateResumePdf, evaluateInterviewAnswers }

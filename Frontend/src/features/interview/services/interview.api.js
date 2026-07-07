@@ -66,6 +66,36 @@ export const updatePlanStatus = async (interviewId, dayNumber, isCompleted) => {
     const response = await api.patch(`/api/interview/report/${interviewId}/plan/${dayNumber}`, {
         isCompleted
     });
-    
+
+    return response.data;
+};
+
+/**
+ * @description Service to evaluate mock interview.
+ * @param {Array} qnaList - Array of objects containing question and answer.
+ * @returns {Promise} - Object containing evaluation result.
+ */
+export const evaluateMockInterview = async (qnaList) => {
+    try {
+        const response = await api.post('/api/interview/evaluate', { qnaList });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || error;
+    }
+};
+
+/**
+ * @description Get all past mock interview scores for the logged-in user.
+ */
+export const getMockResults = async () => {
+    const response = await api.get('/api/interview/mock-results');
+    return response.data;
+};
+
+/**
+ * @description Get a single mock interview result by ID.
+ */
+export const getMockResultById = async (resultId) => {
+    const response = await api.get(`/api/interview/mock-results/${resultId}`);
     return response.data;
 };

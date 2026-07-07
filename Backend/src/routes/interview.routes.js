@@ -44,4 +44,26 @@ interviewRouter.post("/resume/pdf/:interviewReportId", authMiddleware.authUser, 
  */
 interviewRouter.patch("/report/:interviewId/plan/:day", authMiddleware.authUser, interviewController.updatePlanStatusController)
 
+
+/**
+ * @route POST /api/interview/evaluate
+ * @description Evaluate the answers provided in a mock interview (auto-saves result to DB).
+ * @access Private
+ */
+interviewRouter.post("/evaluate", authMiddleware.authUser, interviewController.evaluateMockInterviewController);
+
+/**
+ * @route GET /api/interview/mock-results
+ * @description Get all past mock interview results for the logged-in user.
+ * @access Private
+ */
+interviewRouter.get("/mock-results", authMiddleware.authUser, interviewController.getMockResultsController);
+
+/**
+ * @route GET /api/interview/mock-results/:resultId
+ * @description Get a single mock interview result by ID.
+ * @access Private
+ */
+interviewRouter.get("/mock-results/:resultId", authMiddleware.authUser, interviewController.getMockResultByIdController);
+
 module.exports = interviewRouter

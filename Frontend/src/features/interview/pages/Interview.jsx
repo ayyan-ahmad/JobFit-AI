@@ -16,7 +16,8 @@ import {
     Download,
     X,
     CheckCircle,
-    WifiOff
+    WifiOff,
+    Mic
 } from 'lucide-react'
 
 const NAV_ITEMS = [
@@ -204,11 +205,36 @@ const Interview = () => {
         }
     }, [interviewId])
 
+    // --- New Function ---
+    const handleStartInterview = () => {
+        if (!report) return;
+        
+        // 1. Technical aur Behavioral questions ko combine karo
+        const allQuestions = [
+            ...report.technicalQuestions.map(q => ({ question: q.question })),
+            ...report.behavioralQuestions.map(q => ({ question: q.question }))
+        ];
+
+        // 2. Mix karke top 5 questions nikal lo taaki interview lamba na ho
+        const interviewQuestions = allQuestions.slice(0, 5); 
+
+        // 3. Mock Simulator route par data bhejte hue redirect karo
+        navigate('/mock-interview', { state: { questions: interviewQuestions } });
+    };
+    // ------------------------------------
+
     if (loading || !report) {
         return (
-            <main className="min-h-screen w-full flex flex-col items-center justify-center bg-[#0B0F19] text-white">
-                <Loader2 className="w-12 h-12 animate-spin text-indigo-500 mb-4" />
-                <h1 className="text-2xl font-medium tracking-wide">Loading your interview plan...</h1>
+            <main className="min-h-screen w-full flex flex-col items-center justify-center bg-[#0B0F19] text-white relative overflow-hidden">
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#37415120_1px,transparent_1px),linear-gradient(to_bottom,#37415120_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_45%,#000_85%,transparent_100%)] pointer-events-none" />
+                <div className="absolute top-6 left-1/2 -translate-x-1/2 w-[500px] h-[250px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
+                <div className="relative w-24 h-24 mb-8">
+                    <div className="absolute inset-0 border-t-4 border-indigo-500 rounded-full animate-spin"></div>
+                    <div className="absolute inset-2 border-r-4 border-emerald-500 rounded-full animate-spin-slow"></div>
+                    <div className="absolute inset-4 border-b-4 border-purple-500 rounded-full animate-spin"></div>
+                </div>
+                <h1 className="text-2xl font-bold text-white mb-2 tracking-wide">Loading your interview plan...</h1>
+                <p className="text-indigo-300/70 font-medium">Preparing your personalized strategy</p>
             </main>
         )
     }
@@ -287,6 +313,15 @@ const Interview = () => {
                             )}
                             Download Resume
                         </button>
+                       {/* --- NAYA MOCK INTERVIEW BUTTON YAHAN ADD KARO --- */}
+                        <button
+                            onClick={handleStartInterview}
+                            className="w-full mt-2 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-200 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/30 hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-600/20 group"
+                        >
+                            <Mic className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                            Start AI Interview
+                        </button>
+
 
                     </nav>
 

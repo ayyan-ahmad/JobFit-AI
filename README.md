@@ -6,41 +6,58 @@
 
 ## ✨ Features
 
-- 🧠 **AI Interview Report** — Gemini 3.0 Flash Preview analyzes your resume + job description and generates:
-  - Resume-Job **Match Score** (0–100)
-  - **Technical Questions** with interviewer intent & how to answer
-  - **Behavioral Questions** with intent & suggested answers
-  - **Skill Gap Analysis** (low / medium / high severity)
-  - **7-Day Preparation Plan** with daily tasks
+### 🧠 AI Interview Report
+Powered by **Gemini Flash** — analyzes your resume + job description and generates:
+- ✅ **Resume–Job Match Score** (0–100)
+- ✅ **5–7 Technical Questions** with interviewer intent & model answers
+- ✅ **4–5 Behavioral Questions** with intent & suggested answers
+- ✅ **Skill Gap Analysis** with severity (`low` / `medium` / `high`)
+- ✅ **7-Day Preparation Plan** with daily focused tasks
 
-- 📄 AI Resume PDF Generator — Generate and download a clean, ATS-friendly, job-tailored resume PDF directly in the browser using html2pdf.js
+### 📄 AI Resume PDF Generator
+Generates a clean, single-page, ATS-optimized resume tailored to the target job — downloaded directly in the browser via **html2pdf.js**.
 
-- 🔐 **JWT Authentication** — Secure login/register with cookie + Bearer token support (works on localhost & production)
+### 📧 Daily Email Reminders
+A **cron job** runs every morning at 8 AM (IST) and sends personalized preparation reminder emails for each pending day of the plan. Tracks `reminderSent` to prevent duplicate emails.
 
-- 📁 **Interview History** — View all your past interview reports
+### ✔️ Interactive Prep Tracker
+Mark each day of your preparation plan as complete directly from the report page. Uses **optimistic UI updates** for instant feedback.
+
+### 🔐 JWT Authentication
+Secure login/register with **HTTP-only cookie** based auth. Works seamlessly across localhost and production environments.
+
+### 📁 Interview History
+All generated reports are saved and accessible from your dashboard.
 
 ---
 
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 | Tech | Purpose |
-|------|---------|
-| React + Vite | UI Framework |
-| React Router | Client-side routing |
-| Axios | API calls with interceptors |
-| Context API | Auth & state management |
-| html2pdf.js | Client-side PDF generation |
+|---|---|
+| React 19 + Vite | UI Framework |
+| React Router v7 | Client-side routing |
+| Axios | HTTP client (`withCredentials: true`) |
+| Context API | Auth & interview state management |
+| html2pdf.js | Client-side PDF generation via iframe |
+| Lucide React | Icon library |
+| Tailwind CSS v4 | Utility-first styling |
 
 ### Backend
+
 | Tech | Purpose |
-|------|---------|
-| Node.js + Express | REST API server |
-| MongoDB + Mongoose | Database |
-| Google Gemini AI(`gemini-3-flash-preview`)  | Interview report & resume generation |
-| JWT + bcryptjs | Authentication |
-| pdf-parse | Extract text from uploaded resume PDF |
-| Multer | File upload handling |
+|---|---|
+| Node.js + Express 5 | REST API server |
+| MongoDB + Mongoose | Database & ODM |
+| Google Gemini AI (`gemini-3-flash-preview`) | Interview report + resume generation |
+| JWT + bcryptjs | Authentication & password hashing |
+| pdf-parse | Extract text from uploaded resume PDFs |
+| Multer | File upload handling (memory storage, 3MB limit) |
+| Nodemailer | Email reminder delivery via Gmail SMTP |
+| node-cron | Scheduled daily reminder job |
+
 
 ---
 
@@ -49,13 +66,29 @@
 ```
 JobFit AI/
 ├── Backend/
+│   ├── server.js                       # Entry point — starts Express + DB + cron
 │   └── src/
-│       ├── controllers/       # auth & interview logic
-│       ├── middlewares/       # JWT auth, file upload
-│       ├── models/            # User, InterviewReport, Blacklist
-│       ├── routes/            # API routes
-│       ├── services/          # Gemini AI + HTML generation
-│       └── app.js             # Express app setup
+│       ├── app.js                      # Express setup, CORS, routes
+│       ├── config/
+│       │   └── database.js             # MongoDB connection
+│       ├── controllers/
+│       │   ├── auth.controller.js      # Register, Login, Logout, GetMe
+│       │   └── interview.controller.js # Report generation, PDF, plan tracker
+│       ├── jobs/
+│       │   └── cronTasks.js            # Daily 8AM IST email reminder cron
+│       ├── middlewares/
+│       │   ├── auth.middleware.js      # JWT verification (cookie + Bearer)
+│       │   └── file.middleware.js      # Multer PDF upload (3MB limit)
+│       ├── models/
+│       │   ├── user.models.js          # User schema
+│       │   ├── interviewReport.model.js # Full report schema with plan tracker
+│       │   └── blacklist.model.js      # Logout token blacklist
+│       ├── routes/
+│       │   ├── auth.routes.js          # /api/auth/*
+│       │   └── interview.routes.js     # /api/interview/*
+│       └── services/
+│           ├── ai.services.js          # Gemini AI — report + resume generation
+│           └── email.service.js        # Nodemailer reminder emails
 │
 └── Frontend/
     └── src/
@@ -71,37 +104,67 @@ JobFit AI/
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js v18+
-- MongoDB Atlas account
-- Google Gemini API key
+
+- **Node.js** v18+
+- **MongoDB Atlas** account
+- **Google Gemini API key** — [Get one here](https://aistudio.google.com/apikey)
+- **Gmail App Password** — [Generate one here](https://myaccount.google.com/apppasswords) (required for email reminders)
+
+---
 
 ### 1. Clone the repo
+
 ```bash
 git clone https://github.com/your-username/JobFit-AI.git
 cd JobFit-AI
 ```
 
+---
+
 ### 2. Backend Setup
+
 ```bash
 cd Backend
 npm install
 ```
 
-Create a `.env` file in `Backend/`:
+Create a `.env` file inside `Backend/`:
+
 ```env
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-GOOGLE_GENAI_API_KEY=your_gemini_api_key
-FRONTEND_URL=http://localhost:5173
+# Database
+MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/jobfit-ai
+
+# Auth
+JWT_SECRET=your_long_random_secret_here
 NODE_ENV=development
+
+# Gemini AI
+GOOGLE_GENAI_API_KEY=your_gemini_api_key
+
+# Frontend origin (for CORS)
+FRONTEND_URL=http://localhost:5173
+
+# Email Reminders — Gmail SMTP
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_gmail_app_password
 ```
+
+> ⚠️ **Never commit your `.env` file.** Ensure `Backend/.env` is listed in `.gitignore`.
 
 Start the backend:
+
 ```bash
-nodemon server.js
+npm run dev
 ```
 
+Server runs on **http://localhost:3000** by default.
+
+---
+
 ### 3. Frontend Setup
+
 ```bash
 cd Frontend
 npm install
@@ -112,11 +175,15 @@ The project uses automatic environment switching:
 - `.env.production` → used with `npm run build` (points to deployed backend)
 
 Start the frontend:
+
 ```bash
 npm run dev
 ```
 
+---
+
 ### 4. Open in Browser
+
 ```
 http://localhost:5173
 ```
@@ -125,48 +192,119 @@ http://localhost:5173
 
 ## 🌐 API Endpoints
 
-### Auth
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| POST | `/api/auth/register` | Public | Register new user |
-| POST | `/api/auth/login` | Public | Login user |
-| GET | `/api/auth/logout` | Public | Logout & blacklist token |
-| GET | `/api/auth/get-me` | Private | Get logged-in user info |
+### Auth — `/api/auth`
 
-### Interview
 | Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| POST | `/api/interview/` | Private | Generate interview report (resume PDF optional) |
-| GET | `/api/interview/` | Private | Get all reports of logged-in user |
-| GET | `/api/interview/report/:id` | Private | Get specific report by ID |
-| POST | `/api/interview/resume/pdf/:id` | Private | Generate AI-tailored resume for PDF download |
+|---|---|---|---|
+| `POST` | `/register` | Public | Register new user |
+| `POST` | `/login` | Public | Login + set HTTP-only auth cookie |
+| `GET` | `/logout` | Public | Logout + blacklist token + clear cookie |
+| `GET` | `/get-me` | 🔒 Private | Get current logged-in user info |
+
+### Interview — `/api/interview`
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `POST` | `/` | 🔒 Private | Generate interview report (resume PDF optional) |
+| `GET` | `/` | 🔒 Private | Get all reports for logged-in user |
+| `GET` | `/report/:id` | 🔒 Private | Get specific report by ID |
+| `POST` | `/resume/pdf/:id` | 🔒 Private | Generate AI-tailored resume HTML for PDF download |
+| `PATCH` | `/report/:id/plan/:day` | 🔒 Private | Toggle completion status of a specific prep plan day |
 
 ---
 
 ## 🔒 Authentication Flow
 
-- Token stored in **HTTP-only cookie** (auto-sent with requests)
-- Axios interceptor attaches `Authorization: Bearer <token>` on every request
-- Auto-logout on 401 response or token deletion
+```
+1. User logs in  →  server signs JWT  →  stored in HTTP-only cookie
+2. Cookie is auto-sent with every request  (axios withCredentials: true)
+3. Auth middleware reads cookie  →  verifies JWT  →  checks blacklist
+4. On logout  →  token blacklisted in DB  →  cookie cleared
+```
+
+Both **HTTP-only cookie** and **`Authorization: Bearer <token>` header** are accepted on all private routes.
+
+---
+
+## 📧 Email Reminder System
+
+- Cron runs **every day at 8:00 AM IST**
+- Queries reports with a prep plan day where `targetDate` matches today, `isCompleted = false`, and `reminderSent = false`
+- Sends a task-list email to the user via Gmail SMTP
+- Sets `reminderSent = true` after delivery to prevent duplicate sends (idempotent)
 
 ---
 
 ## ☁️ Deployment
 
-| Service | Platform |
-|---------|----------|
+| Layer | Platform |
+|---|---|
 | Frontend | [Vercel](https://vercel.com) |
 | Backend | [Render](https://render.com) |
-| Database | MongoDB Atlas |
+| Database | [MongoDB Atlas](https://mongodb.com/atlas) |
 
+### Deploy Checklist
+
+- [ ] Add all `.env` variables to Render's environment settings
+- [ ] Set `NODE_ENV=production` on Render
+- [ ] Set `VITE_API_URL` in `Frontend/.env.production` to your Render URL
+- [ ] Add your Vercel domain to `allowedOrigins` in `Backend/src/app.js`
+- [ ] Enable **Auto Deploy on Push** in Render dashboard
 
 ---
 
 ## 📸 Pages
 
-- `/login` — Login page
-- `/register` — Register page
-- `/` — Home (dashboard with past reports + new report form) — **Protected**
-- `/interview/:id` — Full interview report view — **Protected**
+| Route | Page | Access |
+|---|---|---|
+| `/login` | Login | Public |
+| `/register` | Register | Public |
+| `/` | Dashboard — past reports + new report form | 🔒 Protected |
+| `/interview/:id` | Full report — questions, skill gaps, 7-day roadmap, PDF download | 🔒 Protected |
 
 ---
+
+## 🗂️ Data Model
+
+### InterviewReport
+
+```
+{
+  user:                ObjectId          → ref: users
+  title:               String            → Job title (extracted by AI)
+  jobDescription:      String
+  resume:              String            → Extracted text from uploaded PDF
+  selfDescription:     String
+  matchScore:          Number (0–100)
+  technicalQuestions:  Array<{ question, intention, answer }>
+  behavioralQuestions: Array<{ question, intention, answer }>
+  skillGaps:           Array<{ skill, severity: "low" | "medium" | "high" }>
+  preparationPlan:     Array<{
+                         day, focus, tasks[],
+                         targetDate,    → Date for cron matching
+                         isCompleted,  → Toggled by user via checkbox
+                         reminderSent  → Set true after email delivered
+                       }>
+  createdAt, updatedAt
+}
+```
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Commit: `git commit -m "feat: add my feature"`
+4. Push: `git push origin feature/my-feature`
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+MIT License — see [LICENSE](LICENSE) for details.
+
+---
+
+<p align="center">Built with ❤️ using Google Gemini AI</p>

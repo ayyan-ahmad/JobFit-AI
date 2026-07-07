@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react'
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate } from 'react-router'
-import { Loader2, Briefcase, User, UploadCloud, Info, Sparkles } from 'lucide-react'
+import { Loader2, Briefcase, User, UploadCloud, Info, Sparkles, Trophy, TrendingUp } from 'lucide-react'
 
 const Home = () => {
-    const { loading, generateReport, reports } = useInterview()
+    const { loading, generateReport, reports, mockResults } = useInterview()
     const [jobDescription, setJobDescription] = useState("")
     const [selfDescription, setSelfDescription] = useState("")
     const [error, setError] = useState(null)
@@ -26,9 +26,16 @@ const Home = () => {
 
     if (loading) {
         return (
-            <main className="min-h-screen w-full flex flex-col items-center justify-center bg-[#0B0F19] text-white">
-                <Loader2 className="w-12 h-12 animate-spin text-indigo-500 mb-4" />
-                <h1 className="text-2xl font-medium tracking-wide">Loading your interview plan...</h1>
+            <main className="min-h-screen w-full flex flex-col items-center justify-center bg-[#0B0F19] text-white relative overflow-hidden">
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#37415120_1px,transparent_1px),linear-gradient(to_bottom,#37415120_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_45%,#000_85%,transparent_100%)] pointer-events-none" />
+                <div className="absolute top-6 left-1/2 -translate-x-1/2 w-[500px] h-[250px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
+                <div className="relative w-24 h-24 mb-8">
+                    <div className="absolute inset-0 border-t-4 border-indigo-500 rounded-full animate-spin"></div>
+                    <div className="absolute inset-2 border-r-4 border-emerald-500 rounded-full animate-spin-slow"></div>
+                    <div className="absolute inset-4 border-b-4 border-purple-500 rounded-full animate-spin"></div>
+                </div>
+                <h1 className="text-2xl font-bold text-white mb-2 tracking-wide">Loading your dashboard...</h1>
+                <p className="text-indigo-300/70 font-medium">Fetching your interview data</p>
             </main>
         )
     }
@@ -190,6 +197,59 @@ const Home = () => {
                                     </div>
                                 </li>
                             ))}
+                        </ul>
+                    </section>
+                )}
+
+                {/* Past Mock Interview Scores Section */}
+                {mockResults && mockResults.length > 0 && (
+                    <section className="mt-8">
+                        <h2 className="text-lg font-bold text-white mb-4 tracking-wide flex items-center gap-2">
+                            <Trophy className="w-5 h-5 text-amber-400" />
+                            Past Mock Interview Scores
+                        </h2>
+                        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {mockResults.map((result) => {
+                                const score = result.overallScore;
+                                const isGood = score >= 70;
+                                const isMid = score >= 50 && score < 70;
+                                return (
+                                    <li
+                                        key={result._id}
+                                        className="bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.14] rounded-xl p-4 flex flex-col justify-between gap-3 group cursor-pointer transition-all duration-200 hover:bg-white/[0.04]"
+                                        onClick={() => navigate(`/mock-result/${result._id}`)}
+                                    >
+                                        <div className="flex items-start justify-between gap-2">
+                                            <div className="flex items-center gap-2">
+                                                <TrendingUp className={`w-4 h-4 shrink-0 ${isGood ? 'text-emerald-400' : isMid ? 'text-amber-400' : 'text-rose-400'}`} />
+                                                <p className="text-xs text-gray-500">
+                                                    {new Date(result.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                </p>
+                                            </div>
+                                            <span className={`text-lg font-black font-mono ${isGood ? 'text-emerald-400' : isMid ? 'text-amber-400' : 'text-rose-400'}`}>
+                                                {score}<span className="text-xs text-gray-600 font-normal">/100</span>
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-gray-400 leading-relaxed line-clamp-2">
+                                            {result.overallSummary}
+                                        </p>
+                                        <div className="flex items-center justify-between pt-2 border-t border-white/[0.04]">
+                                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                                                isGood
+                                                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                                    : isMid
+                                                        ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                                        : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                                            }`}>
+                                                {isGood ? '✓ Strong' : isMid ? '⚡ Average' : '↗ Needs Work'}
+                                            </span>
+                                            <span className="text-[10px] text-gray-600 group-hover:text-indigo-400 transition-colors font-medium">
+                                                View Details →
+                                            </span>
+                                        </div>
+                                    </li>
+                                );
+                            })}
                         </ul>
                     </section>
                 )}
