@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate, useParams } from 'react-router'
+// Add this with your other imports
+import { updatePlanStatus } from '../services/interview.api.js'
 // Modern premium icons imported here
 import {
     Loader2,
@@ -115,24 +117,78 @@ const QuestionCard = ({ item, index }) => {
     )
 }
 
-const RoadMapDay = ({ day }) => (
-    <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 space-y-3">
-        <div className="flex items-center gap-3">
-            <span className="text-xs font-bold px-2.5 py-1 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-md">
-                Day {day.day}
-            </span>
-            <h3 className="text-sm md:text-base font-bold text-white tracking-wide">{day.focus}</h3>
+const RoadMapDay = ({ day, interviewId, setToast }) => {
+    // 1. Local state for Optimistic Update
+    const [isCompleted, setIsCompleted] = useState(day.isCompleted || false);
+
+    // 2. Toggle Handler
+    const handleToggle = async () => {
+        const originalState = isCompleted;
+        const newState = !isCompleted;
+
+        // Optimistic UI Update (Instant change for the user)
+        setIsCompleted(newState);
+
+        try {
+            // Background API Call
+            await updatePlanStatus(interviewId, day.day, newState);
+        } catch (error) {
+            // Rollback if backend fails
+            setIsCompleted(originalState);
+            setToast({
+                type: 'error',
+                message: `Failed to update Day ${day.day} status. Please try again.`
+            });
+        }
+    };
+
+    return (
+        <div className={`bg-white/[0.02] border transition-all duration-300 rounded-xl p-4 space-y-3 ${isCompleted ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-white/[0.06]'
+            }`}>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <span className={`text-xs font-bold px-2.5 py-1 rounded-md border ${isCompleted
+                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                            : 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                        }`}>
+                        Day {day.day}
+                    </span>
+                    <h3 className={`text-sm md:text-base font-bold tracking-wide ${isCompleted ? 'text-gray-500 line-through' : 'text-white'
+                        }`}>
+                        {day.focus}
+                    </h3>
+                </div>
+
+                {/* Interactive Custom Checkbox */}
+                <label className="flex items-center cursor-pointer relative">
+                    <input
+                        type="checkbox"
+                        checked={isCompleted}
+                        onChange={handleToggle}
+                        className="peer sr-only"
+                    />
+                    <div className={`w-5 h-5 rounded flex items-center justify-center transition-all duration-200 border-2 ${isCompleted
+                            ? 'bg-emerald-500 border-emerald-500'
+                            : 'border-gray-500 hover:border-indigo-400 bg-transparent'
+                        }`}>
+                        {isCompleted && <CheckCircle className="w-3.5 h-3.5 text-white" />}
+                    </div>
+                </label>
+            </div>
+
+            <ul className="space-y-2 pl-1">
+                {day.tasks.map((task, i) => (
+                    <li key={i} className={`text-xs md:text-sm flex items-start gap-2.5 ${isCompleted ? 'text-gray-600' : 'text-gray-400'
+                        }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-2 ${isCompleted ? 'bg-emerald-500/40' : 'bg-purple-400/70'
+                            }`} />
+                        <span className="leading-relaxed">{task}</span>
+                    </li>
+                ))}
+            </ul>
         </div>
-        <ul className="space-y-2 pl-1">
-            {day.tasks.map((task, i) => (
-                <li key={i} className="text-xs md:text-sm text-gray-400 flex items-start gap-2.5">
-                    <span className="w-1.5 h-1.5 bg-purple-400/70 rounded-full shrink-0 mt-2" />
-                    <span className="leading-relaxed">{task}</span>
-                </li>
-            ))}
-        </ul>
-    </div>
-)
+    )
+}
 
 // ── Main Component ────────────────────────────────────────────────────────────
 const Interview = () => {
@@ -278,7 +334,12 @@ const Interview = () => {
                                 </div>
                                 <div className="space-y-3">
                                     {report.preparationPlan.map((day) => (
-                                        <RoadMapDay key={day.day} day={day} />
+                                        <RoadMapDay
+                                            key={day.day}
+                                            day={day}
+                                            interviewId={interviewId}
+                                            setToast={setToast}
+                                        />
                                     ))}
                                 </div>
                             </div>

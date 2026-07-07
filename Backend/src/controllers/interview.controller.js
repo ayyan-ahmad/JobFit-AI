@@ -1,5 +1,5 @@
 const pdfParse = require("pdf-parse")
-const { generateInterviewReport,generateResumePdf } = require("../services/ai.services")
+const { generateInterviewReport, generateResumePdf } = require("../services/ai.services")
 const interviewReportModel = require("../models/interviewReport.model")
 
 
@@ -32,6 +32,19 @@ async function generateInterViewReportController(req, res) {
             selfDescription,
             jobDescription
         })
+        // 🔴 CHANGE 1: Har plan day ke liye targetDate compute karna
+        if (interViewReportByAi && interViewReportByAi.preparationPlan) {
+            interViewReportByAi.preparationPlan = interViewReportByAi.preparationPlan.map((plan) => {
+                const targetDate = new Date();
+                // Aaj ki date mein jitne dynamic "day" hain unhe add kar rahe hain (e.g., Day 1 = Tomorrow)
+                targetDate.setDate(targetDate.getDate() + Number(plan.day));
+
+                return {
+                    ...plan,
+                    targetDate: targetDate
+                };
+            });
+        }
 
         const interviewReport = await interviewReportModel.create({
             user: req.user.id,
@@ -150,4 +163,41 @@ async function generateResumePdfController(req, res) {
     }
 }
 
-module.exports = { generateInterViewReportController, getInterviewReportByIdController, getAllInterviewReportsController, generateResumePdfController }
+/**
+ * 🔴 CHANGE 2: Naya Controller Jo Frontend Checkbox Ka State Update Karega
+ * @description Controller to update the completion status of a specific day's plan.
+ */
+async function updatePlanStatusController(req, res) {
+    try {
+        const { interviewId, day } = req.params;
+        const { isCompleted } = req.body; // Expecting boolean true/false
+
+        // Using positional operator `$` to update the object matching the array element criteria
+        const interviewReport = await interviewReportModel.findOneAndUpdate(
+            {
+                _id: interviewId,
+                user: req.user.id,
+                "preparationPlan.day": Number(day)
+            },
+            {
+                $set: { "preparationPlan.$.isCompleted": isCompleted }
+            },
+            { new: true }
+        );
+
+        if (!interviewReport) {
+            return res.status(404).json({ message: "Interview report or specific day not found." });
+        }
+
+        res.status(200).json({
+            message: "Plan status updated successfully.",
+            interviewReport
+        });
+
+    } catch (error) {
+        console.error("Error in updatePlanStatusController:", error);
+        res.status(500).json({ message: "Failed to update plan status.", error: error.message });
+    }
+}
+
+module.exports = { generateInterViewReportController, getInterviewReportByIdController, getAllInterviewReportsController, generateResumePdfController, updatePlanStatusController }

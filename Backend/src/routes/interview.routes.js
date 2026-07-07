@@ -37,6 +37,11 @@ interviewRouter.get("/", authMiddleware.authUser, interviewController.getAllInte
 interviewRouter.post("/resume/pdf/:interviewReportId", authMiddleware.authUser, interviewController.generateResumePdfController)
 
 
-
+/**
+ * @route PATCH /api/interview/report/:interviewId/plan/:day
+ * @description Update the completion status of a specific day's plan.
+ * @access Private
+ */
+interviewRouter.patch("/report/:interviewId/plan/:day", authMiddleware.authUser, interviewController.updatePlanStatusController)
 
 module.exports = interviewRouter

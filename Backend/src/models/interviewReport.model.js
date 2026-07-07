@@ -173,6 +173,10 @@ const preparationPlanSchema = new mongoose.Schema({
         type: Number,
         required: [true, "Day is required"]
     },
+    targetDate: {  // 🔴 NAYA FIELD: Cron job ke liye date
+        type: Date,
+        required: [true, "Target date is required"]
+    },
     focus: {
         type: String,
         required: [true, "Focus is required"]
@@ -180,7 +184,15 @@ const preparationPlanSchema = new mongoose.Schema({
     tasks: [{
         type: String,
         required: [true, "Task is required"]
-    }]
+    }],
+    isCompleted: { // 🔴 NAYA FIELD: Frontend checkbox ke liye
+        type: Boolean,
+        default: false
+    },
+    reminderSent: { // 🔴 NAYA FIELD: Double email rokne ke liye
+        type: Boolean,
+        default: false
+    }
 })
 
 const interviewReportSchema = new mongoose.Schema({

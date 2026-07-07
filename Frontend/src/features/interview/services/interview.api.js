@@ -57,3 +57,15 @@ export const generateResumePdf = async ({ interviewReportId }) => {
     const response = await api.post(`/api/interview/resume/pdf/${interviewReportId}`)
     return response.data
 }
+
+/**
+ * @description Service to update the completion status of a specific day's plan.
+ */
+export const updatePlanStatus = async (interviewId, dayNumber, isCompleted) => {
+    // Note: yahan axios instance 'api' use ho raha hai, jo base URL aur credentials handle kar lega
+    const response = await api.patch(`/api/interview/report/${interviewId}/plan/${dayNumber}`, {
+        isCompleted
+    });
+    
+    return response.data;
+};
