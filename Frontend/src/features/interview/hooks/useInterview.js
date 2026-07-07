@@ -62,7 +62,7 @@ export const useInterview = () => {
             setLoading(false)
         }
     }
- const getResumePdf = async (interviewReportId) => {
+    const getResumePdf = async (interviewReportId) => {
         setLoading(true)
         try {
             const data = await generateResumePdf({ interviewReportId })
@@ -71,30 +71,28 @@ export const useInterview = () => {
 
             const html2pdf = (await import('html2pdf.js')).default
 
-            // Parse the full HTML document Gemini returns and extract <style> + <body> content
-            const parser = new DOMParser()
-            const doc = parser.parseFromString(html, 'text/html')
-            const bodyContent = doc.body.innerHTML
-            const styleContent = Array.from(doc.querySelectorAll('style'))
-                .map(s => s.outerHTML).join('')
-
-            // Create a container that is visible but off-screen (html2canvas needs it rendered)
-            const container = document.createElement('div')
-            container.style.cssText = `
+            // Use an iframe so body/html CSS selectors apply correctly
+            const iframe = document.createElement('iframe')
+            iframe.style.cssText = `
                 position: fixed;
                 left: -9999px;
                 top: 0;
                 width: 794px;
-                min-height: 1123px;
-                background: white;
-                z-index: -9999;
-                overflow: hidden;
+                height: 1123px;
+                border: none;
+                visibility: hidden;
             `
-            container.innerHTML = styleContent + bodyContent
-            document.body.appendChild(container)
+            document.body.appendChild(iframe)
 
-            // Wait for browser to render it
-            await new Promise(resolve => setTimeout(resolve, 300))
+            // Write full HTML into iframe
+            iframe.contentDocument.open()
+            iframe.contentDocument.write(html)
+            iframe.contentDocument.close()
+
+            // Wait for iframe to fully render (fonts, styles, layout)
+            await new Promise(resolve => setTimeout(resolve, 600))
+
+            const iframeBody = iframe.contentDocument.body
 
             await html2pdf().set({
                 margin: 0,
@@ -111,12 +109,13 @@ export const useInterview = () => {
                     scrollY: 0,
                     backgroundColor: '#ffffff',
                     logging: false,
+                    foreignObjectRendering: false,
                 },
                 jsPDF: { unit: 'px', format: [794, 1123], orientation: 'portrait' },
                 pagebreak: { mode: 'avoid-all' }
-            }).from(container).save()
+            }).from(iframeBody).save()
 
-            document.body.removeChild(container)
+            document.body.removeChild(iframe)
 
             return { success: true }
         }
@@ -135,7 +134,7 @@ export const useInterview = () => {
         } else {
             getReports()
         }
-    }, [ interviewId ])
+    }, [interviewId])
 
     return { loading, report, reports, generateReport, getReportById, getReports, getResumePdf }
 
