@@ -64,32 +64,46 @@ export const useInterview = () => {
     }
  const getResumePdf = async (interviewReportId) => {
         setLoading(true)
-        let response = null
         try {
-            response = await generateResumePdf({ interviewReportId })
-            const url = window.URL.createObjectURL(new Blob([response], { type: "application/pdf" }))
-            const link = document.createElement("a")
-            link.href = url
-            link.setAttribute("download", `resume_${interviewReportId}.pdf`)
-            document.body.appendChild(link)
-            link.click()
-            link.remove()
-            window.URL.revokeObjectURL(url)
+            const data = await generateResumePdf({ interviewReportId })
+            const html = data?.html
+            if (!html) throw new Error("No HTML content received")
+
+            const html2pdf = (await import('html2pdf.js')).default
+
+            const element = document.createElement('div')
+            element.innerHTML = html
+
+            // Apply single-page constraints directly to the element
+            element.style.width = '794px'      // A4 width at 96dpi
+            element.style.maxHeight = '1123px' // A4 height at 96dpi
+            element.style.overflow = 'hidden'
+            element.style.boxSizing = 'border-box'
+
+            document.body.appendChild(element)
+
+            await html2pdf().set({
+                margin: 0,
+                filename: `resume_${interviewReportId}.pdf`,
+                image: { type: 'jpeg', quality: 1 },
+                html2canvas: {
+                    scale: 1.5,
+                    useCORS: true,
+                    width: 794,
+                    height: 1123,
+                    windowWidth: 794,
+                    scrollY: 0,
+                },
+                jsPDF: { unit: 'px', format: [794, 1123], orientation: 'portrait' },
+                pagebreak: { mode: 'avoid-all' }
+            }).from(element).save()
+
+            document.body.removeChild(element)
+
             return { success: true }
         }
         catch (error) {
-            // Axios blob responses need special parsing to extract JSON error
-            let message = "Failed to generate resume PDF. Please try again."
-            try {
-                if (error?.response?.data instanceof Blob) {
-                    const text = await error.response.data.text()
-                    const json = JSON.parse(text)
-                    message = json?.message || message
-                } else if (error?.response?.data?.message) {
-                    message = error.response.data.message
-                }
-            } catch (_) { }
-
+            const message = error?.response?.data?.message || error?.message || "Failed to generate resume PDF. Please try again."
             console.error("Resume PDF error:", message)
             return { success: false, message }
         } finally {

@@ -1,6 +1,4 @@
 const { GoogleGenAI } = require("@google/genai")
-const puppeteer = require("puppeteer-core")
-const chromium = require("@sparticuz/chromium")
 
 
 
@@ -87,7 +85,7 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
 `
 
     const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-3-flash-preview",
         contents: prompt,
         config: {
             responseMimeType: "application/json",
@@ -104,52 +102,6 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
 
 }
 
-
-async function generatePdfFromHtml(htmlContent) {
-    const isProduction = process.env.NODE_ENV === "production"
-
-    let browser
-
-    if (isProduction) {
-        // Render / serverless — use @sparticuz/chromium
-        browser = await puppeteer.launch({
-            args: chromium.args,
-            defaultViewport: chromium.defaultViewport,
-            executablePath: await chromium.executablePath(),
-            headless: chromium.headless,
-        })
-    } else {
-        // Local dev — use system Chrome directly
-        browser = await puppeteer.launch({
-            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-            args: [
-                "--no-sandbox",
-                "--disable-setuid-sandbox",
-                "--disable-dev-shm-usage",
-                "--disable-gpu"
-            ],
-            headless: true,
-        })
-    }
-
-    const page = await browser.newPage()
-    await page.setContent(htmlContent, { waitUntil: "networkidle0" })
-
-    const pdfBuffer = await page.pdf({
-        format: "A4",
-        printBackground: true,
-        margin: {
-            top: "12mm",
-            bottom: "12mm",
-            left: "8mm",
-            right: "15mm"
-        }
-    })
-
-    await browser.close()
-
-    return pdfBuffer
-}
 
 async function generateResumePdf({ resume, selfDescription, jobDescription }) {
 
@@ -169,19 +121,21 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
                     - Target Job Description: ${jobDescription}
 
                     STRICT REQUIREMENTS:
-                    1. SINGLE PAGE ONLY — absolutely no overflow beyond one A4 page (210mm x 297mm).
-                    2. ATS FRIENDLY — use plain semantic HTML: <h1>, <h2>, <h3>, <p>, <ul>, <li>. NO tables, NO columns, NO flexbox for layout, NO CSS Grid. Single-column only.
-                    3. FONT — use font-family: 'Arial', 'Helvetica', sans-serif. No Google Fonts (no @import).
-                    4. MARGINS — body margin: 0; padding: 0. Content wrapper: padding: 12mm 15mm 12mm 8mm.
-                    5. FONT SIZES — Name: 20px bold; Section headings: 13px bold uppercase with a 1px solid #333 bottom border and 4px margin-bottom; Body text: 11px; Line-height: 1.4.
-                    6. SECTIONS ORDER — Name & Contact Info → Summary → Skills → Experience → Education → (optional: Projects or Certifications if space allows).
-                    7. COLORS — black text (#111) on white (#fff) background. Section heading underline: #333. Subtle only.
-                    8. SPACING — minimize padding/margins to ensure single page. Use margin: 6px 0 between sections.
-                    9. SKILLS — display as comma-separated text in a <p> tag, NOT as pills or badges.
-                    10. EXPERIENCE entries — Role Title | Company | Date (same line), then bullet points as <ul><li>.
-                    11. NO images, icons, SVGs, or decorative elements.
-                    12. Include a <style> block inside <head>. No external stylesheets.
-                    13. The complete document must be a valid full HTML page: <!DOCTYPE html><html><head>...</head><body>...</body></html>.
+                    1. SINGLE PAGE ONLY — the entire resume MUST fit within exactly 794px wide × 1123px tall. This is non-negotiable.
+                    2. Set on <body>: margin:0; padding:0; width:794px; height:1123px; max-height:1123px; overflow:hidden; box-sizing:border-box;
+                    3. Content wrapper <div>: width:794px; max-height:1123px; overflow:hidden; padding:28px 36px 20px 36px; box-sizing:border-box;
+                    4. ATS FRIENDLY — use plain semantic HTML: <h1>, <h2>, <h3>, <p>, <ul>, <li>. NO tables, NO columns, NO flexbox for layout, NO CSS Grid. Single-column only.
+                    5. FONT — use font-family: 'Arial', 'Helvetica', sans-serif. No Google Fonts (no @import).
+                    6. FONT SIZES — Name: 20px bold; Section headings: 12px bold uppercase with a 1px solid #333 bottom border and 3px margin-bottom; Body text: 10.5px; Line-height: 1.35.
+                    7. SECTIONS ORDER — Name & Contact Info → Summary → Skills → Experience → Education → (optional: Projects or Certifications ONLY if space allows).
+                    8. COLORS — black text (#111) on white (#fff) background. Section heading underline: #333. Subtle only.
+                    9. SPACING — use margin: 5px 0 between sections. Keep padding/margins minimal to ensure everything stays within 1123px height.
+                    10. SKILLS — display as comma-separated text in a <p> tag, NOT as pills or badges.
+                    11. EXPERIENCE entries — Role Title | Company | Date (same line), then bullet points as <ul><li>. Max 2-3 bullets per role.
+                    12. NO images, icons, SVGs, or decorative elements.
+                    13. Include a <style> block inside <head>. No external stylesheets.
+                    14. The complete document must be a valid full HTML page: <!DOCTYPE html><html><head>...</head><body>...</body></html>.
+                    15. CRITICAL: If content would overflow 1123px, reduce bullet points, shorten descriptions, or omit optional sections. Never exceed the height limit.
 
                     Tailor the resume content specifically to the target job description to maximize ATS keyword match.
                     Return ONLY the JSON object with field "html" containing the complete HTML string.
@@ -190,7 +144,7 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
 
 
     const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-3-flash-preview",
         contents: prompt,
         config: {
             responseMimeType: "application/json",
@@ -201,9 +155,7 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
 
     const jsonContent = JSON.parse(response.text)
 
-    const pdfBuffer = await generatePdfFromHtml(jsonContent.html)
-
-    return pdfBuffer
+    return jsonContent.html
 
 }
 
