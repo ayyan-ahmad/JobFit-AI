@@ -6,14 +6,14 @@
 
 ## ✨ Features
 
-- 🧠 **AI Interview Report** — Gemini 2.5 Flash analyzes your resume + job description and generates:
+- 🧠 **AI Interview Report** — Gemini 3.0 Flash Preview analyzes your resume + job description and generates:
   - Resume-Job **Match Score** (0–100)
   - **Technical Questions** with interviewer intent & how to answer
   - **Behavioral Questions** with intent & suggested answers
   - **Skill Gap Analysis** (low / medium / high severity)
   - **7-Day Preparation Plan** with daily tasks
 
-- 📄 **AI Resume PDF Generator** — Generate a clean, ATS-friendly, job-tailored resume PDF in one click
+- 📄 AI Resume PDF Generator — Generate and download a clean, ATS-friendly, job-tailored resume PDF directly in the browser using html2pdf.js
 
 - 🔐 **JWT Authentication** — Secure login/register with cookie + Bearer token support (works on localhost & production)
 
@@ -30,14 +30,14 @@
 | React Router | Client-side routing |
 | Axios | API calls with interceptors |
 | Context API | Auth & state management |
+| html2pdf.js | Client-side PDF generation |
 
 ### Backend
 | Tech | Purpose |
 |------|---------|
 | Node.js + Express | REST API server |
 | MongoDB + Mongoose | Database |
-| Google Gemini AI (`gemini-2.5-flash`) | Interview report & resume generation |
-| Puppeteer + Chromium | PDF generation from HTML |
+| Google Gemini AI(`gemini-3-flash-preview`)  | Interview report & resume generation |
 | JWT + bcryptjs | Authentication |
 | pdf-parse | Extract text from uploaded resume PDF |
 | Multer | File upload handling |
@@ -54,7 +54,7 @@ JobFit AI/
 │       ├── middlewares/       # JWT auth, file upload
 │       ├── models/            # User, InterviewReport, Blacklist
 │       ├── routes/            # API routes
-│       ├── services/          # Gemini AI + PDF generation
+│       ├── services/          # Gemini AI + HTML generation
 │       └── app.js             # Express app setup
 │
 └── Frontend/
@@ -139,7 +139,7 @@ http://localhost:5173
 | POST | `/api/interview/` | Private | Generate interview report (resume PDF optional) |
 | GET | `/api/interview/` | Private | Get all reports of logged-in user |
 | GET | `/api/interview/report/:id` | Private | Get specific report by ID |
-| POST | `/api/interview/resume/pdf/:id` | Private | Generate & download resume PDF |
+| POST | `/api/interview/resume/pdf/:id` | Private | Generate AI-tailored resume for PDF download |
 
 ---
 
