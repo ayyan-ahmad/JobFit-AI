@@ -17,7 +17,16 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
-    }
+    },
+// Gamification
+totalPoints: {
+    type: Number,
+    default: 0
+},
+practiceSessionsCompleted: {
+    type: Number,
+    default: 0
+}
 })
 
 const userModel = mongoose.model("users", userSchema)

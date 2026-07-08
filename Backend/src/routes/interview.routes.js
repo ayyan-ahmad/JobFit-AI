@@ -1,6 +1,7 @@
 const express = require("express")
 const authMiddleware = require("../middlewares/auth.middleware")
 const interviewController = require("../controllers/interview.controller")
+const mockInterviewController = require("../controllers/mockInterview.controller")
 const upload = require("../middlewares/filr.middleware")
 
 const interviewRouter = express.Router()
@@ -50,20 +51,20 @@ interviewRouter.patch("/report/:interviewId/plan/:day", authMiddleware.authUser,
  * @description Evaluate the answers provided in a mock interview (auto-saves result to DB).
  * @access Private
  */
-interviewRouter.post("/evaluate", authMiddleware.authUser, interviewController.evaluateMockInterviewController);
+interviewRouter.post("/evaluate", authMiddleware.authUser, mockInterviewController.evaluateMockInterviewController);
 
 /**
  * @route GET /api/interview/mock-results
  * @description Get all past mock interview results for the logged-in user.
  * @access Private
  */
-interviewRouter.get("/mock-results", authMiddleware.authUser, interviewController.getMockResultsController);
+interviewRouter.get("/mock-results", authMiddleware.authUser, mockInterviewController.getMockResultsController);
 
 /**
  * @route GET /api/interview/mock-results/:resultId
  * @description Get a single mock interview result by ID.
  * @access Private
  */
-interviewRouter.get("/mock-results/:resultId", authMiddleware.authUser, interviewController.getMockResultByIdController);
+interviewRouter.get("/mock-results/:resultId", authMiddleware.authUser, mockInterviewController.getMockResultByIdController);
 
 module.exports = interviewRouter
