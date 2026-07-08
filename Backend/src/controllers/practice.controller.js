@@ -25,7 +25,7 @@ const startPracticeSession = async (req, res) => {
 
         // 2. Database mein naya practice session create karo
         const newSession = new PracticeSession({
-            userId: req.user._id, // User tracking ke liye
+            userId: req.user.id, // User tracking ke liye
             selectedTopics: topics,
             questions: generatedQuestions,
             userAnswers: [], // Starting empty, answers baad me submit honge
@@ -111,7 +111,7 @@ const evaluateSessionAnswers = async (req, res) => {
 
 const getPracticeHistory = async (req, res) => {
     try {
-        const sessions = await PracticeSession.find({ userId: req.user._id })
+        const sessions = await PracticeSession.find({ userId: req.user.id })
             .sort({ createdAt: -1 })
             .select("-questions -userAnswers"); // Skip heavy data for listing
             
@@ -126,7 +126,7 @@ const getPracticeSessionById = async (req, res) => {
     try {
         const session = await PracticeSession.findOne({ 
             _id: req.params.sessionId, 
-            userId: req.user._id 
+            userId: req.user.id 
         });
 
         if (!session) {
