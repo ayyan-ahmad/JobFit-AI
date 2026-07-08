@@ -6,8 +6,8 @@ import Home from "./features/interview/pages/Home";
 import Interview from "./features/interview/pages/Interview";
 import MockSimulator from "./features/interview/pages/MockSimulator";
 import MockResult from "./features/interview/pages/MockResult";
-import PracticePage from "./features/interview/pages/PracticePage";
-import PracticeResultPage from "./features/interview/pages/PracticeResultPage";
+import PracticePage from "./features/practice/pages/PracticePage";
+import PracticeResultPage from "./features/practice/pages/PracticeResultPage";
 
 
 

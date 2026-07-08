@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useContext } from 'react'
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate } from 'react-router'
 import { Loader2, Briefcase, User, UploadCloud, Info, Sparkles, Trophy, TrendingUp, Target, PlusCircle, History, FileText, LayoutDashboard, LogOut, Menu, X } from 'lucide-react'
-import { getPracticeHistory } from '../services/practice.api'
+import { getPracticeHistory } from '../../practice/services/practice.api'
 import { AuthContext } from '../../auth/auth.context'
 
 const Home = () => {
