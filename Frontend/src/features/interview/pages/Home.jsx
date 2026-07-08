@@ -1,16 +1,28 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate } from 'react-router'
-import { Loader2, Briefcase, User, UploadCloud, Info, Sparkles, Trophy, TrendingUp } from 'lucide-react'
+import { Loader2, Briefcase, User, UploadCloud, Info, Sparkles, Trophy, TrendingUp, Target } from 'lucide-react'
+import { getPracticeHistory } from '../services/practice.api'
 
 const Home = () => {
     const { loading, generateReport, reports, mockResults } = useInterview()
     const [jobDescription, setJobDescription] = useState("")
     const [selfDescription, setSelfDescription] = useState("")
     const [error, setError] = useState(null)
+    const [practiceSessions, setPracticeSessions] = useState([])
     const resumeInputRef = useRef()
 
     const navigate = useNavigate()
+
+    useEffect(() => {
+        getPracticeHistory()
+            .then(data => {
+                if (data && data.success) {
+                    setPracticeSessions(data.sessions || [])
+                }
+            })
+            .catch(err => console.error("Error fetching practice history", err))
+    }, [])
 
     const handleGenerateReport = async () => {
         setError(null)
@@ -52,6 +64,20 @@ const Home = () => {
 
             {/* Main Content Wrapper - Controlled padding for laptop screens */}
             <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 flex flex-col justify-center">
+
+                {/* Top Navbar */}
+                <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/[0.06]">
+                    <div className="font-bold text-xl text-white tracking-wider flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-indigo-400" />
+                        JobFit AI
+                    </div>
+                    <button
+                        onClick={() => navigate("/practice")}
+                        className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-sm font-bold rounded-lg shadow-lg shadow-purple-500/20 transition-all duration-200 flex items-center gap-2"
+                    >
+                        <span>🎯</span> Custom Practice Test
+                    </button>
+                </div>
 
                 {/* Page Header - Made title smaller to save height */}
                 <header className="max-w-2xl mx-auto text-center mb-6">
@@ -162,9 +188,14 @@ const Home = () => {
                             )}
                             <button
                                 onClick={handleGenerateReport}
+                                disabled={loading}
                                 className="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/10 hover:shadow-indigo-500/20 transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 group">
-                                <Sparkles className="w-3.5 h-3.5 text-indigo-200 group-hover:scale-110 transition-transform" />
-                                Generate My Interview Strategy
+                                {loading ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <Sparkles className="w-3.5 h-3.5 text-indigo-200 group-hover:scale-110 transition-transform" />
+                                )}
+                                {loading ? 'Generating...' : 'Generate My Interview Strategy'}
                             </button>
                         </div>
                     </div>
@@ -172,25 +203,31 @@ const Home = () => {
 
                 {/* Recent Reports Grid Section - Tighter margins */}
                 {reports.length > 0 && (
-                    <section className="mt-8">
-                        <h2 className="text-lg font-bold text-white mb-4 tracking-wide">My Recent Interview Plans</h2>
-                        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <section className="mt-12">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+                                <Briefcase className="w-4 h-4 text-indigo-400" />
+                            </div>
+                            <h2 className="text-xl font-bold text-white tracking-wide">My Recent Interview Plans</h2>
+                        </div>
+                        <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                             {reports.map(report => (
                                 <li
                                     key={report._id}
-                                    className="bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] rounded-xl p-4 flex flex-col justify-between gap-4 group cursor-pointer"
+                                    className="relative bg-white/[0.02] border border-white/[0.06] hover:border-indigo-500/30 rounded-2xl p-5 flex flex-col justify-between gap-4 group cursor-pointer transition-all duration-300 hover:bg-white/[0.04] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden"
                                     onClick={() => navigate(`/interview/${report._id}`)}>
-                                    <div>
-                                        <h3 className="text-sm font-bold text-white group-hover:text-indigo-400 transition-colors line-clamp-1">{report.title || 'Untitled Position'}</h3>
-                                        <p className="text-[10px] text-gray-500 mt-0.5">Generated on {new Date(report.createdAt).toLocaleDateString()}</p>
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-[40px] -mr-10 -mt-10 transition-opacity opacity-0 group-hover:opacity-100" />
+                                    <div className="relative z-10">
+                                        <h3 className="text-base font-bold text-gray-100 group-hover:text-indigo-300 transition-colors line-clamp-1">{report.title || 'Untitled Position'}</h3>
+                                        <p className="text-xs text-gray-500 mt-1">Generated on {new Date(report.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                                     </div>
-                                    <div className="flex items-center justify-between pt-2 border-t border-white/[0.04]">
-                                        <span className="text-[11px] text-gray-400">Match Accuracy</span>
-                                        <span className={`text-xs font-bold font-mono px-2 py-0.5 rounded ${report.matchScore >= 80
-                                                ? 'text-emerald-400 bg-emerald-500/5 border border-emerald-500/10'
-                                                : report.matchScore >= 60
-                                                    ? 'text-amber-400 bg-amber-500/5 border border-amber-500/10'
-                                                    : 'text-rose-400 bg-rose-500/5 border border-rose-500/10'
+                                    <div className="relative z-10 flex items-center justify-between pt-3 border-t border-white/[0.04]">
+                                        <span className="text-xs text-gray-400 font-medium tracking-wide">Match Accuracy</span>
+                                        <span className={`text-xs font-bold font-mono px-2.5 py-1 rounded-md shadow-sm ${report.matchScore >= 80
+                                            ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20'
+                                            : report.matchScore >= 60
+                                                ? 'text-amber-400 bg-amber-500/10 border border-amber-500/20'
+                                                : 'text-rose-400 bg-rose-500/10 border border-rose-500/20'
                                             }`}>
                                             {report.matchScore}%
                                         </span>
@@ -203,12 +240,14 @@ const Home = () => {
 
                 {/* Past Mock Interview Scores Section */}
                 {mockResults && mockResults.length > 0 && (
-                    <section className="mt-8">
-                        <h2 className="text-lg font-bold text-white mb-4 tracking-wide flex items-center gap-2">
-                            <Trophy className="w-5 h-5 text-amber-400" />
-                            Past Mock Interview Scores
-                        </h2>
-                        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <section className="mt-12">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20 shadow-[0_0_15px_rgba(251,191,36,0.2)]">
+                                <Trophy className="w-4 h-4 text-amber-400" />
+                            </div>
+                            <h2 className="text-xl font-bold text-white tracking-wide">Past Mock Interview Scores</h2>
+                        </div>
+                        <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                             {mockResults.map((result) => {
                                 const score = result.overallScore;
                                 const isGood = score >= 70;
@@ -216,35 +255,99 @@ const Home = () => {
                                 return (
                                     <li
                                         key={result._id}
-                                        className="bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.14] rounded-xl p-4 flex flex-col justify-between gap-3 group cursor-pointer transition-all duration-200 hover:bg-white/[0.04]"
+                                        className="relative bg-white/[0.02] border border-white/[0.06] hover:border-amber-500/30 rounded-2xl p-5 flex flex-col justify-between gap-4 group cursor-pointer transition-all duration-300 hover:bg-white/[0.04] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden"
                                         onClick={() => navigate(`/mock-result/${result._id}`)}
                                     >
-                                        <div className="flex items-start justify-between gap-2">
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-[40px] -mr-10 -mt-10 transition-opacity opacity-0 group-hover:opacity-100" />
+                                        <div className="relative z-10 flex items-start justify-between gap-3">
                                             <div className="flex items-center gap-2">
-                                                <TrendingUp className={`w-4 h-4 shrink-0 ${isGood ? 'text-emerald-400' : isMid ? 'text-amber-400' : 'text-rose-400'}`} />
-                                                <p className="text-xs text-gray-500">
+                                                <div className={`w-6 h-6 rounded-md flex items-center justify-center bg-white/[0.03] border ${isGood ? 'border-emerald-500/30' : isMid ? 'border-amber-500/30' : 'border-rose-500/30'}`}>
+                                                    <TrendingUp className={`w-3.5 h-3.5 ${isGood ? 'text-emerald-400' : isMid ? 'text-amber-400' : 'text-rose-400'}`} />
+                                                </div>
+                                                <p className="text-xs text-gray-400 font-medium tracking-wide">
                                                     {new Date(result.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                                 </p>
                                             </div>
-                                            <span className={`text-lg font-black font-mono ${isGood ? 'text-emerald-400' : isMid ? 'text-amber-400' : 'text-rose-400'}`}>
-                                                {score}<span className="text-xs text-gray-600 font-normal">/100</span>
+                                            <span className={`text-xl font-black font-mono drop-shadow-md ${isGood ? 'text-emerald-400' : isMid ? 'text-amber-400' : 'text-rose-400'}`}>
+                                                {score}<span className="text-xs text-gray-500 font-medium">/100</span>
                                             </span>
                                         </div>
-                                        <p className="text-xs text-gray-400 leading-relaxed line-clamp-2">
+                                        <p className="relative z-10 text-xs text-gray-400 leading-relaxed line-clamp-2">
                                             {result.overallSummary}
                                         </p>
-                                        <div className="flex items-center justify-between pt-2 border-t border-white/[0.04]">
-                                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
-                                                isGood
-                                                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                                                    : isMid
-                                                        ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                                                        : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
-                                            }`}>
-                                                {isGood ? '✓ Strong' : isMid ? '⚡ Average' : '↗ Needs Work'}
+                                        <div className="relative z-10 flex items-center justify-between pt-3 border-t border-white/[0.04]">
+                                            <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md border tracking-wider uppercase shadow-sm ${isGood
+                                                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                                : isMid
+                                                    ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                                    : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                                                }`}>
+                                                {isGood ? 'Strong' : isMid ? 'Average' : 'Needs Work'}
                                             </span>
-                                            <span className="text-[10px] text-gray-600 group-hover:text-indigo-400 transition-colors font-medium">
-                                                View Details →
+                                            <span className="text-[11px] text-gray-500 group-hover:text-amber-400 transition-colors font-semibold flex items-center gap-1">
+                                                View Details <span className="text-[14px] leading-none mb-[2px]">→</span>
+                                            </span>
+                                        </div>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </section>
+                )}
+
+                {/* Practice Sessions Section */}
+                {practiceSessions && practiceSessions.length > 0 && (
+                    <section className="mt-12 pt-10 border-t border-white/[0.04]">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.2)]">
+                                <Target className="w-4 h-4 text-purple-400" />
+                            </div>
+                            <h2 className="text-xl font-bold text-white tracking-wide">Past Custom Practice Tests</h2>
+                        </div>
+                        <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                            {practiceSessions.map((session) => {
+                                const score = session.evaluation?.totalScore || 0;
+                                const isGood = score >= 7;
+                                const isMid = score >= 5 && score < 7;
+                                return (
+                                    <li
+                                        key={session._id}
+                                        className="relative bg-white/[0.02] border border-white/[0.06] hover:border-purple-500/30 rounded-2xl p-5 flex flex-col justify-between gap-4 group cursor-pointer transition-all duration-300 hover:bg-white/[0.04] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden"
+                                        onClick={() => navigate(`/practice-result/${session._id}`)}
+                                    >
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-[40px] -mr-10 -mt-10 transition-opacity opacity-0 group-hover:opacity-100" />
+                                        <div className="relative z-10 flex items-start justify-between gap-3">
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-6 h-6 rounded-md flex items-center justify-center bg-white/[0.03] border ${isGood ? 'border-emerald-500/30' : isMid ? 'border-amber-500/30' : 'border-rose-500/30'}`}>
+                                                    <Target className={`w-3.5 h-3.5 ${isGood ? 'text-emerald-400' : isMid ? 'text-amber-400' : 'text-rose-400'}`} />
+                                                </div>
+                                                <p className="text-xs text-gray-400 font-medium tracking-wide">
+                                                    {new Date(session.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                </p>
+                                            </div>
+                                            <span className={`text-xl font-black font-mono drop-shadow-md ${isGood ? 'text-emerald-400' : isMid ? 'text-amber-400' : 'text-rose-400'}`}>
+                                                {score}<span className="text-xs text-gray-500 font-medium">/10</span>
+                                            </span>
+                                        </div>
+                                        <div className="relative z-10 text-xs text-gray-400 leading-relaxed line-clamp-2 flex flex-wrap gap-1.5 items-center">
+                                            <span className="text-gray-500 font-medium">Topics:</span>
+                                            {session.selectedTopics.map((t, idx) => (
+                                                <span key={idx} className="bg-white/[0.05] border border-white/[0.08] text-gray-300 px-2 py-0.5 rounded-md text-[10px] tracking-wide uppercase">
+                                                    {t}
+                                                </span>
+                                            ))}
+                                        </div>
+                                        <div className="relative z-10 flex items-center justify-between pt-3 border-t border-white/[0.04]">
+                                            <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md border tracking-wider uppercase shadow-sm ${isGood
+                                                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                                : isMid
+                                                    ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                                    : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                                                }`}>
+                                                {isGood ? 'Strong' : isMid ? 'Average' : 'Needs Work'}
+                                            </span>
+                                            <span className="text-[11px] text-gray-500 group-hover:text-purple-400 transition-colors font-semibold flex items-center gap-1">
+                                                {session.status === 'completed' ? 'Completed →' : 'Pending →'}
                                             </span>
                                         </div>
                                     </li>

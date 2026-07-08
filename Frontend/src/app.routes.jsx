@@ -6,6 +6,8 @@ import Home from "./features/interview/pages/Home";
 import Interview from "./features/interview/pages/Interview";
 import MockSimulator from "./features/interview/pages/MockSimulator";
 import MockResult from "./features/interview/pages/MockResult";
+import PracticePage from "./features/interview/pages/PracticePage";
+import PracticeResultPage from "./features/interview/pages/PracticeResultPage";
 
 
 
@@ -39,6 +41,20 @@ export const router = createBrowserRouter([
     element:
     <Protected>
         <MockResult />
+    </Protected>
+  },
+  {
+    path: "/practice",
+    element:
+    <Protected>
+        <PracticePage />
+    </Protected>
+  },
+  {
+    path: "/practice-result/:sessionId",
+    element:
+    <Protected>
+        <PracticeResultPage />
     </Protected>
   }
 
