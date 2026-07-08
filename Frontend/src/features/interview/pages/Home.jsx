@@ -1,16 +1,19 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useContext } from 'react'
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate } from 'react-router'
-import { Loader2, Briefcase, User, UploadCloud, Info, Sparkles, Trophy, TrendingUp, Target, PlusCircle, History, FileText, LayoutDashboard } from 'lucide-react'
+import { Loader2, Briefcase, User, UploadCloud, Info, Sparkles, Trophy, TrendingUp, Target, PlusCircle, History, FileText, LayoutDashboard, LogOut, Menu, X } from 'lucide-react'
 import { getPracticeHistory } from '../services/practice.api'
+import { AuthContext } from '../../auth/auth.context'
 
 const Home = () => {
+    const { user, handleLogout } = useContext(AuthContext)
     const { loading, generateReport, reports, mockResults } = useInterview()
     const [jobDescription, setJobDescription] = useState("")
     const [selfDescription, setSelfDescription] = useState("")
     const [error, setError] = useState(null)
     const [practiceSessions, setPracticeSessions] = useState([])
     const [activeTab, setActiveTab] = useState('create')
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const resumeInputRef = useRef()
 
     const navigate = useNavigate()
@@ -119,34 +122,82 @@ const Home = () => {
                 </nav>
 
                 <div className="p-5 border-t border-white/[0.06] bg-white/[0.01]">
-                    <div className="flex items-center gap-3 px-2 py-1">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-gray-700 to-gray-600 flex items-center justify-center text-white font-bold text-xs border border-white/10">
-                            <User className="w-4 h-4" />
+                    <div className="flex items-center justify-between px-2 py-1">
+                        <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-gray-700 to-gray-600 flex items-center justify-center text-white font-bold text-xs border border-white/10 uppercase">
+                                {user?.username?.charAt(0) || <User className="w-4 h-4" />}
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-sm font-bold text-white truncate max-w-[100px]">{user?.username || 'My Account'}</span>
+                                <span className="text-[10px] text-emerald-400 font-semibold tracking-wide">Online</span>
+                            </div>
                         </div>
-                        <div className="flex flex-col">
-                            <span className="text-sm font-bold text-white">My Account</span>
-                            <span className="text-[10px] text-emerald-400 font-semibold tracking-wide">Online</span>
-                        </div>
+                        <button 
+                            onClick={handleLogout} 
+                            title="Logout"
+                            className="text-gray-500 hover:text-rose-400 transition-colors p-2 rounded-lg hover:bg-rose-500/10"
+                        >
+                            <LogOut className="w-4 h-4" />
+                        </button>
                     </div>
                 </div>
             </aside>
 
             {/* Mobile Header */}
-            <div className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-[#0B0F19]/90 backdrop-blur-xl border-b border-white/[0.06] flex flex-col p-4 gap-4">
+            <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#0B0F19]/90 backdrop-blur-xl border-b border-white/[0.06] flex items-center justify-between p-4">
                 <div className="font-extrabold text-lg text-white tracking-wider flex items-center gap-2">
                     <Sparkles className="w-5 h-5 text-indigo-400" />
                     JobFit AI
                 </div>
-                <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                    <button onClick={() => setActiveTab('create')} className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-colors ${activeTab === 'create' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'text-gray-400 border border-white/[0.05] bg-white/[0.02]'}`}>Create Plan</button>
-                    <button onClick={() => setActiveTab('plans')} className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-colors ${activeTab === 'plans' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'text-gray-400 border border-white/[0.05] bg-white/[0.02]'}`}>Plans</button>
-                    <button onClick={() => setActiveTab('mocks')} className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-colors ${activeTab === 'mocks' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'text-gray-400 border border-white/[0.05] bg-white/[0.02]'}`}>Mocks</button>
-                    <button onClick={() => setActiveTab('practices')} className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-colors ${activeTab === 'practices' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'text-gray-400 border border-white/[0.05] bg-white/[0.02]'}`}>Practice Tests</button>
+                <div className="flex items-center gap-1">
+                    <button 
+                        onClick={handleLogout} 
+                        className="text-gray-400 hover:text-rose-400 transition-colors p-2 rounded-lg hover:bg-rose-500/10"
+                    >
+                        <LogOut className="w-5 h-5" />
+                    </button>
+                    <button 
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        className="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/5"
+                    >
+                        {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                    </button>
                 </div>
             </div>
 
+            {/* Mobile Menu Overlay */}
+            {isMobileMenuOpen && (
+                <div className="lg:hidden fixed inset-0 z-30 bg-[#0B0F19]/95 backdrop-blur-xl pt-[80px] pb-6 px-4 flex flex-col overflow-y-auto animate-in fade-in slide-in-from-top-4 duration-300">
+                    <div className="flex flex-col gap-2">
+                        <button onClick={() => { setActiveTab('create'); setIsMobileMenuOpen(false); }} className={`flex items-center justify-between p-4 rounded-xl transition-all duration-300 border ${activeTab === 'create' ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400' : 'bg-white/[0.02] border-transparent text-gray-300 hover:bg-indigo-500/5 hover:border-indigo-500/20 hover:text-indigo-300'}`}>
+                            <span className="font-bold text-sm">Create Interview Plan</span>
+                            <LayoutDashboard className={`w-5 h-5 ${activeTab === 'create' ? 'opacity-100' : 'opacity-50'}`} />
+                        </button>
+                        <button onClick={() => { navigate("/practice"); setIsMobileMenuOpen(false); }} className={`flex items-center justify-between p-4 rounded-xl transition-all duration-300 bg-white/[0.02] border border-transparent text-gray-300 hover:bg-purple-500/10 hover:border-purple-500/30 hover:text-purple-400`}>
+                            <span className="font-bold text-sm">Custom Practice Test</span>
+                            <Target className="w-5 h-5 opacity-50 group-hover:opacity-100" />
+                        </button>
+                        
+                        <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-6 mb-2 px-2">My History</div>
+                        
+                        <button onClick={() => { setActiveTab('plans'); setIsMobileMenuOpen(false); }} className={`flex items-center justify-between p-4 rounded-xl transition-all duration-300 border ${activeTab === 'plans' ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400' : 'bg-white/[0.02] border-transparent text-gray-300 hover:bg-indigo-500/5 hover:border-indigo-500/20 hover:text-indigo-300'}`}>
+                            <span className="font-bold text-sm">Recent Plans</span>
+                            <Briefcase className={`w-5 h-5 ${activeTab === 'plans' ? 'opacity-100' : 'opacity-50'}`} />
+                        </button>
+                        <button onClick={() => { setActiveTab('mocks'); setIsMobileMenuOpen(false); }} className={`flex items-center justify-between p-4 rounded-xl transition-all duration-300 border ${activeTab === 'mocks' ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-white/[0.02] border-transparent text-gray-300 hover:bg-amber-500/5 hover:border-amber-500/20 hover:text-amber-300'}`}>
+                            <span className="font-bold text-sm">Mock Scores</span>
+                            <History className={`w-5 h-5 ${activeTab === 'mocks' ? 'opacity-100' : 'opacity-50'}`} />
+                        </button>
+                        <button onClick={() => { setActiveTab('practices'); setIsMobileMenuOpen(false); }} className={`flex items-center justify-between p-4 rounded-xl transition-all duration-300 border ${activeTab === 'practices' ? 'bg-purple-500/10 border-purple-500/30 text-purple-400' : 'bg-white/[0.02] border-transparent text-gray-300 hover:bg-purple-500/5 hover:border-purple-500/20 hover:text-purple-300'}`}>
+                            <span className="font-bold text-sm">Practice Tests</span>
+                            <FileText className={`w-5 h-5 ${activeTab === 'practices' ? 'opacity-100' : 'opacity-50'}`} />
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Main Content Area */}
-            <main className="relative z-10 flex-1 h-screen overflow-y-auto pt-[110px] lg:pt-0">
+            <main className="relative z-10 flex-1 h-screen overflow-y-auto pt-[80px] lg:pt-0">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 py-8 lg:py-12 min-h-full flex flex-col">
                     
                     {/* --- TAB: CREATE PLAN --- */}
