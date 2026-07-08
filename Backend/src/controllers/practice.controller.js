@@ -1,5 +1,6 @@
 const PracticeSession = require("../models/practiceSession.model");
 const { generateCustomPracticeQuestions, evaluatePracticeSession } = require("../services/ai.services");
+const { updateUserPoints } = require("./gamification.controller");
 
 /**
  * @route   POST /api/practice/start
@@ -94,6 +95,10 @@ const evaluateSessionAnswers = async (req, res) => {
         session.status = "completed";
 
         await session.save();
+
+        // --- UPDATE GAMIFICATION POINTS ---
+        // Give the user points based on their score
+        await updateUserPoints(req.user.id, aiEvaluation.totalScore);
 
         // 4. Send metrics directly to dashboard scoreboard UI
         return res.status(200).json({

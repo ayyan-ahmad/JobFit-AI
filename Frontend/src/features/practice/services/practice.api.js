@@ -67,8 +67,19 @@ export async function getPracticeSessionById(sessionId) {
   try {
     const response = await apiClient.get(`/api/practice/history/${sessionId}`);
     return response.data;
-  } catch (error) {
+} catch (error) {
     console.error("Error fetching practice session details:", error);
     throw error;
   }
 }
+
+// Leaderboard ka data fetch karne ke liye API call
+export const fetchLeaderboard = async () => {
+    try {
+        const response = await apiClient.get('/api/gamification/leaderboard'); 
+        return response.data; // Yeh backend se { success: true, data: [...] } return karega
+    } catch (error) {
+        console.error("Error fetching leaderboard:", error);
+        throw error;
+    }
+};

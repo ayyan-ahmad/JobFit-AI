@@ -8,6 +8,7 @@ import MockSimulator from "./features/interview/pages/MockSimulator";
 import MockResult from "./features/interview/pages/MockResult";
 import PracticePage from "./features/practice/pages/PracticePage";
 import PracticeResultPage from "./features/practice/pages/PracticeResultPage";
+import Leaderboard from "./features/gamification/pages/Leaderboard";
 
 
 
@@ -56,7 +57,13 @@ export const router = createBrowserRouter([
     <Protected>
         <PracticeResultPage />
     </Protected>
+  },
+  {
+    path: "/leaderboard",
+    element:
+    <Protected>
+        <Leaderboard />
+    </Protected>
   }
-
 
 ])

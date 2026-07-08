@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useContext } from 'react'
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate } from 'react-router'
-import { Loader2, Briefcase, User, UploadCloud, Info, Sparkles, Trophy, TrendingUp, Target, PlusCircle, History, FileText, LayoutDashboard, LogOut, Menu, X } from 'lucide-react'
+import { Loader2, Briefcase, User, UploadCloud, Info, Sparkles, Trophy, TrendingUp, Target, PlusCircle, History, FileText, LayoutDashboard, LogOut, Menu, X, Crown } from 'lucide-react'
 import { getPracticeHistory } from '../../practice/services/practice.api'
 import { AuthContext } from '../../auth/auth.context'
 
@@ -94,6 +94,14 @@ const Home = () => {
                         <span className="text-sm font-bold group-hover:text-purple-400 transition-colors">Custom Practice Test</span>
                     </button>
 
+                    <button 
+                        onClick={() => navigate("/leaderboard")} 
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-gray-400 hover:bg-white/[0.02] hover:text-gray-200 border border-transparent group"
+                    >
+                        <Crown className="w-5 h-5 text-gray-500 group-hover:text-yellow-400 transition-colors" />
+                        <span className="text-sm font-bold group-hover:text-yellow-400 transition-colors">Global Leaderboard</span>
+                    </button>
+
                     <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-8 mb-2 px-3">My History</div>
 
                     <button 
@@ -176,6 +184,10 @@ const Home = () => {
                         <button onClick={() => { navigate("/practice"); setIsMobileMenuOpen(false); }} className={`flex items-center justify-between p-4 rounded-xl transition-all duration-300 bg-white/[0.02] border border-transparent text-gray-300 hover:bg-purple-500/10 hover:border-purple-500/30 hover:text-purple-400`}>
                             <span className="font-bold text-sm">Custom Practice Test</span>
                             <Target className="w-5 h-5 opacity-50 group-hover:opacity-100" />
+                        </button>
+                        <button onClick={() => { navigate("/leaderboard"); setIsMobileMenuOpen(false); }} className={`flex items-center justify-between p-4 rounded-xl transition-all duration-300 bg-white/[0.02] border border-transparent text-gray-300 hover:bg-yellow-500/10 hover:border-yellow-500/30 hover:text-yellow-400`}>
+                            <span className="font-bold text-sm">Global Leaderboard</span>
+                            <Crown className="w-5 h-5 opacity-50 group-hover:opacity-100" />
                         </button>
                         
                         <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-6 mb-2 px-2">My History</div>
