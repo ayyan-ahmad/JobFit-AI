@@ -1,3 +1,5 @@
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
 const nodemailer = require('nodemailer');
 
 // Transporter configuration: Yeh humare Node app ko SMTP server se connect karta hai
