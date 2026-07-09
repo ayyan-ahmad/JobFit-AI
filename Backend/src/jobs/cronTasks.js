@@ -4,7 +4,7 @@ const { sendReminderEmail } = require('../services/email.service');
 
 // Cron Expression: "0 8 * * *" ka matlab hai har din subah 8:00 AM
 // Testing ke liye agar tumhe har 1 minute mein chalana hai toh "* * * * *" likh sakte ho
-const START_CRON_SCHEDULE = "0 8 * * *";
+const START_CRON_SCHEDULE = "* * * * *";
 
 const startDailyReminders = () => {
     cron.schedule(START_CRON_SCHEDULE, async () => {
@@ -23,7 +23,7 @@ const startDailyReminders = () => {
             const reports = await interviewReportModel.find({
                 "preparationPlan": {
                     $elemMatch: {
-                        targetDate: { $gte: todayStart, $lte: todayEnd },
+
                         isCompleted: false,
                         reminderSent: false
                     }
@@ -45,8 +45,7 @@ const startDailyReminders = () => {
 
                 // Find the exact day plan from the array that matches today
                 const todayPlanIndex = report.preparationPlan.findIndex(plan =>
-                    plan.targetDate >= todayStart &&
-                    plan.targetDate <= todayEnd &&
+
                     !plan.isCompleted &&
                     !plan.reminderSent
                 );
