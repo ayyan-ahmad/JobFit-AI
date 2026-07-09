@@ -79,7 +79,7 @@ const startDailyReminders = () => {
             console.error("[Cron Engine Error] Failed to process daily reminders:", error);
         }
     }, {
-        timezone: "Asia/kolkata"
+        timezone: "Asia/Kolkata"
     }
     );
 
