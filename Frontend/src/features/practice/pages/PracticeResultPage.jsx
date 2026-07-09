@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import PracticeScoreboard from "./PracticeScoreboard";
 import { getPracticeSessionById } from "../services/practice.api";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import RingLoader from "../../../components/RingLoader";
 
 const PracticeResultPage = () => {
     const { sessionId } = useParams();
@@ -30,11 +31,7 @@ const PracticeResultPage = () => {
     }, [sessionId]);
 
     if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-[#0B0F19]">
-                <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
-            </div>
-        );
+        return <RingLoader title="Loading Practice Result..." subtitle="Analyzing your performance" />
     }
 
     if (error || !session) {

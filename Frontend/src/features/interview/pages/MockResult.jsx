@@ -5,6 +5,7 @@ import {
     Loader2, ArrowLeft, Award, Target, Play,
     CheckCircle, AlertCircle
 } from 'lucide-react';
+import RingLoader from '../../../components/RingLoader';
 
 const MockResult = () => {
     const { resultId } = useParams();
@@ -22,30 +23,18 @@ const MockResult = () => {
         }
     }, [resultId]);
 
-    if (loading || !result) {
+    if (loading && !error) {
+        return <RingLoader title="Loading your scorecard..." subtitle="Fetching your interview results" />
+    }
+
+    if (error || !result) {
         return (
             <div className="min-h-screen bg-[#0B0F19] flex flex-col items-center justify-center text-white relative overflow-hidden">
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#37415120_1px,transparent_1px),linear-gradient(to_bottom,#37415120_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_45%,#000_85%,transparent_100%)] pointer-events-none" />
-                <div className="absolute top-6 left-1/2 -translate-x-1/2 w-[500px] h-[250px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
-                {error ? (
-                    <>
-                        <AlertCircle className="w-12 h-12 text-rose-400 mb-3" />
-                        <p className="text-rose-300 font-medium mb-2">{error}</p>
-                        <button onClick={() => navigate('/')} className="text-sm text-gray-400 hover:text-white flex items-center gap-1.5 transition-colors">
-                            <ArrowLeft className="w-4 h-4" /> Back to Home
-                        </button>
-                    </>
-                ) : (
-                    <>
-                        <div className="relative w-24 h-24 mb-8">
-                            <div className="absolute inset-0 border-t-4 border-indigo-500 rounded-full animate-spin"></div>
-                            <div className="absolute inset-2 border-r-4 border-emerald-500 rounded-full animate-spin-slow"></div>
-                            <div className="absolute inset-4 border-b-4 border-purple-500 rounded-full animate-spin"></div>
-                        </div>
-                        <h2 className="text-2xl font-bold text-white mb-2 tracking-wide">Loading your scorecard...</h2>
-                        <p className="text-indigo-300/70 font-medium">Fetching your interview results</p>
-                    </>
-                )}
+                <AlertCircle className="w-12 h-12 text-rose-400 mb-3" />
+                <p className="text-rose-300 font-medium mb-2">{error || "Result not found"}</p>
+                <button onClick={() => navigate('/')} className="text-sm text-gray-400 hover:text-white flex items-center gap-1.5 transition-colors">
+                    <ArrowLeft className="w-4 h-4" /> Back to Home
+                </button>
             </div>
         );
     }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate, useParams } from 'react-router'
+import RingLoader from '../../../components/RingLoader'
 // Add this with your other imports
 import { updatePlanStatus } from '../services/interview.api.js'
 // Modern premium icons imported here
@@ -149,8 +150,8 @@ const RoadMapDay = ({ day, interviewId, setToast }) => {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <span className={`text-xs font-bold px-2.5 py-1 rounded-md border ${isCompleted
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                            : 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                        : 'bg-purple-500/10 text-purple-400 border-purple-500/20'
                         }`}>
                         Day {day.day}
                     </span>
@@ -169,8 +170,8 @@ const RoadMapDay = ({ day, interviewId, setToast }) => {
                         className="peer sr-only"
                     />
                     <div className={`w-5 h-5 rounded flex items-center justify-center transition-all duration-200 border-2 ${isCompleted
-                            ? 'bg-emerald-500 border-emerald-500'
-                            : 'border-gray-500 hover:border-indigo-400 bg-transparent'
+                        ? 'bg-emerald-500 border-emerald-500'
+                        : 'border-gray-500 hover:border-indigo-400 bg-transparent'
                         }`}>
                         {isCompleted && <CheckCircle className="w-3.5 h-3.5 text-white" />}
                     </div>
@@ -208,7 +209,7 @@ const Interview = () => {
     // --- New Function ---
     const handleStartInterview = () => {
         if (!report) return;
-        
+
         // 1. Technical aur Behavioral questions ko combine karo
         const allQuestions = [
             ...report.technicalQuestions.map(q => ({ question: q.question })),
@@ -216,7 +217,7 @@ const Interview = () => {
         ];
 
         // 2. Mix karke top 5 questions nikal lo taaki interview lamba na ho
-        const interviewQuestions = allQuestions.slice(0, 5); 
+        const interviewQuestions = allQuestions.slice(0, 5);
 
         // 3. Mock Simulator route par data bhejte hue redirect karo
         navigate('/mock-interview', { state: { questions: interviewQuestions } });
@@ -224,19 +225,7 @@ const Interview = () => {
     // ------------------------------------
 
     if (loading || !report) {
-        return (
-            <main className="min-h-screen w-full flex flex-col items-center justify-center bg-[#0B0F19] text-white relative overflow-hidden">
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#37415120_1px,transparent_1px),linear-gradient(to_bottom,#37415120_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_45%,#000_85%,transparent_100%)] pointer-events-none" />
-                <div className="absolute top-6 left-1/2 -translate-x-1/2 w-[500px] h-[250px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
-                <div className="relative w-24 h-24 mb-8">
-                    <div className="absolute inset-0 border-t-4 border-indigo-500 rounded-full animate-spin"></div>
-                    <div className="absolute inset-2 border-r-4 border-emerald-500 rounded-full animate-spin-slow"></div>
-                    <div className="absolute inset-4 border-b-4 border-purple-500 rounded-full animate-spin"></div>
-                </div>
-                <h1 className="text-2xl font-bold text-white mb-2 tracking-wide">Loading your interview plan...</h1>
-                <p className="text-indigo-300/70 font-medium">Preparing your personalized strategy</p>
-            </main>
-        )
+        return <RingLoader title="Loading your interview plan..." subtitle="Preparing your personalized strategy" />
     }
 
     return (
@@ -313,7 +302,7 @@ const Interview = () => {
                             )}
                             Download Resume
                         </button>
-                       {/* --- NAYA MOCK INTERVIEW BUTTON YAHAN ADD KARO --- */}
+                        {/* --- NAYA MOCK INTERVIEW BUTTON YAHAN ADD KARO --- */}
                         <button
                             onClick={handleStartInterview}
                             className="w-full mt-2 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-200 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/30 hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-600/20 group"

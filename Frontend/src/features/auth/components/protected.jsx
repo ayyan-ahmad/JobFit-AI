@@ -1,6 +1,7 @@
 import { useAuth } from "../hooks/useAuth";
 import { Navigate } from "react-router";
 import React from 'react'
+import RingLoader from '../../../components/RingLoader'
 
 const Protected = ({ children }) => {
     const { loading, user } = useAuth()
@@ -8,7 +9,7 @@ const Protected = ({ children }) => {
 
 
     if (loading) {
-        return (<main><h1>Loading...</h1></main>)
+        return <RingLoader title="Verifying your session..." subtitle="Please wait a moment" />
     }
 
     if (!user) {

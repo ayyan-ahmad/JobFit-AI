@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router'
 import { useAuth } from '../hooks/useAuth'
 // Mail aur Lock icons ko import kiya responsive look ke liye
 import { LogIn, Loader2, Mail, Lock } from 'lucide-react'
+import RingLoader from '../../../components/RingLoader'
 
 const Login = () => {
     const { loading, handleLogin } = useAuth()
@@ -28,12 +29,7 @@ const Login = () => {
     }
 
     if (loading) {
-        return (
-            <main className="min-h-screen w-full flex flex-col items-center justify-center bg-[#0B0F19] text-white">
-                <Loader2 className="w-12 h-12 animate-spin text-indigo-500 mb-4" />
-                <h1 className="text-2xl font-medium tracking-wide">Loading...</h1>
-            </main>
-        )
+        return <RingLoader title="Signing you in..." subtitle="Please wait a moment" />
     }
 
     return (

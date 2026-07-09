@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchLeaderboard } from "../../practice/services/practice.api.js";
 import { Trophy, Medal, Crown, Loader2, ArrowLeft, Award } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import RingLoader from '../../../components/RingLoader';
 
 const Leaderboard = () => {
     const [users, setUsers] = useState([]);
@@ -27,12 +28,7 @@ const Leaderboard = () => {
     }, []);
 
     if (loading) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-[#0B0F19] text-white">
-                <Loader2 className="w-10 h-10 animate-spin text-indigo-500 mb-4" />
-                <p className="text-indigo-200/70 font-medium tracking-wide">Loading Global Standings...</p>
-            </div>
-        );
+        return <RingLoader title="Loading Leaderboard..." subtitle="Fetching Global Standings" />
     }
 
     // Top 3 users alag se nikalne ke liye for Podium look
