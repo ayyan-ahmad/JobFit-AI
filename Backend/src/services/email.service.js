@@ -9,6 +9,7 @@ const transporter = nodemailer.createTransport({
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
     },
+    family: 4, // Forces Node.js to use IPv4 instead of IPv6. Fixes ENETUNREACH error on Render!
 });
 
 /**
@@ -18,7 +19,7 @@ const transporter = nodemailer.createTransport({
  * @param {string} jobTitle - The job role they are preparing for
  * @param {number} dayNumber - Which day of the plan it is
  * @param {Array<string>} tasks - The tasks for the day
- */
+*/
 const sendReminderEmail = async (to, userName, jobTitle, dayNumber, tasks) => {
     try {
         // Converting tasks array into an HTML list for a clean email format
