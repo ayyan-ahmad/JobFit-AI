@@ -122,16 +122,7 @@ JobFit AI/
 
 ---
 
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/your-username/JobFit-AI.git
-cd JobFit-AI
-```
-
----
-
-### 2. Backend Setup
+### 1. Backend Setup
 
 ```bash
 cd Backend
@@ -174,7 +165,7 @@ Server runs on **http://localhost:3000** by default.
 
 ---
 
-### 3. Frontend Setup
+### 2. Frontend Setup
 
 ```bash
 cd Frontend
@@ -193,7 +184,7 @@ npm run dev
 
 ---
 
-### 4. Open in Browser
+### 3. Open in Browser
 
 ```
 http://localhost:5173
