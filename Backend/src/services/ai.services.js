@@ -14,11 +14,15 @@ const aiPractice = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENAI_API_KEY_PR
 /**
  * @description Generates 10 mixed questions (Subjective, MCQ, MSQ) based on selected topics.
  */
-const generateCustomPracticeQuestions = async ({ topics }) => {
+const generateCustomPracticeQuestions = async ({ topicsWithDifficulty }) => {
     try {
+        const topicsListStr = topicsWithDifficulty.map(t => `${t.topic} (${t.difficulty} difficulty)`).join(", ");
         const prompt = `
         You are an expert technical interviewer and computer science professor.
-        Generate exactly 10 high-quality interview questions based strictly on these selected topics: ${topics.join(", ")}.
+        Generate exactly 10 high-quality interview questions based strictly on these selected topics and their specified difficulties:
+        ${topicsListStr}
+        
+        Adjust the complexity, depth, and trickiness of the questions according to the requested difficulty level for each topic.
         
         The 10 questions MUST be a mix of these three types:
         1. "subjective": Open-ended conceptual question where the user will type or speak the answer.
@@ -40,6 +44,7 @@ const generateCustomPracticeQuestions = async ({ topics }) => {
             "id": 1,
             "type": "mcq" | "msq" | "subjective",
             "topic": "topic_name",
+            "difficulty": "easy" | "medium" | "hard",
             "question": "The question text here",
             "options": ["Option A", "Option B", "Option C", "Option D"] or null,
             "correctAnswer": "Option B" (for mcq) or ["Option A", "Option C"] (for msq) or "Brief ideal answer overview" (for subjective),
@@ -79,10 +84,11 @@ const evaluatePracticeSession = async ({ questions, userAnswers }) => {
         User's Answers: ${JSON.stringify(userAnswers)}
         
         CRITICAL EVALUATION RULES:
-        1. For "mcq" and "msq": Compare user's answer with 'correctAnswer' directly. If it matches exactly (or all elements match for msq array), mark as correct. Otherwise incorrect.
-        2. For "subjective": Grade dynamically based on semantic completeness and core concepts touched by the user (ignore small typos from microphone stream).
-        3. Provide individual question feedbacks explaining WHY it was correct/incorrect and what is the missing concept.
-        4. Calculate a 'totalScore' out of 10 based on how many questions they got right or did well on.
+        1. For "mcq": Compare user's answer with 'correctAnswer' directly. If it matches exactly, mark as correct with score 1. Otherwise incorrect with score 0.
+        2. For "msq": If user selected some correct options but not all, or included an incorrect option, give partial score between 0 and 1 (e.g., 0.5). If all perfectly match, score 1.
+        3. For "subjective": Grade dynamically based on semantic completeness and core concepts touched by the user. Assign a 'score' between 0 and 1 (e.g., 0.3, 0.7).
+        4. Provide individual question feedbacks explaining WHY it was correct/incorrect and what is missing.
+        5. Calculate a 'totalScore' out of 10 based on the sum of all individual scores.
         
         Return the response strictly as a structured JSON object matching the schema below without any markdown code blocks.
 
@@ -94,6 +100,7 @@ const evaluatePracticeSession = async ({ questions, userAnswers }) => {
             {
               "questionId": 1,
               "isCorrect": true,
+              "score": 0.5,
               "feedback": "Explain clarity or correct answer summary here."
             }
           ]
@@ -194,7 +201,7 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
                         Self Description: ${selfDescription || "Not provided"}
                         Job Description: ${jobDescription}
 
-                        Generate 5-7 technical questions, 4-5 behavioral questions, identify key skill gaps, and create a 7-day preparation plan.
+                        Generate 6 technical questions, 4 behavioral questions, identify key skill gaps, and create a 7-day preparation plan.
 `
 
     const response = await ai.models.generateContent({
@@ -259,9 +266,9 @@ const evaluateInterviewAnswers = async (qnaList) => {
         Evaluate the candidate's performance. For EACH question, provide:
         1. A score out of 10 (be honest and strict).
         2. Detailed, constructive feedback on what was good and what was missing or technically wrong.
-        3. A concise ideal model answer for that question.
+        3. A concise ideal model answer for that question. It MUST be short, conversational, and realistic for a verbal interview (avoid overly long textbook definitions).
 
-        Also provide an OVERALL score out of 100 and a brief overall performance summary.
+        Also provide an OVERALL score out of 100 based on the sum of the individual scores, and a brief overall performance summary.
     `;
 
     const response = await ai.models.generateContent({

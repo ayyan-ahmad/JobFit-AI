@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router'
 import { useAuth } from '../hooks/useAuth'
-// Mail aur Lock icons ko import kiya responsive look ke liye
-import { LogIn, Loader2, Mail, Lock } from 'lucide-react'
+import { LogIn, Target, BrainCircuit, ArrowRight, Sparkles } from 'lucide-react'
 import RingLoader from '../../../components/RingLoader'
 
 const Login = () => {
@@ -33,89 +32,162 @@ const Login = () => {
     }
 
     return (
-        <main className="min-h-screen w-full flex items-center justify-center bg-[#0B0F19] relative overflow-hidden px-4 py-8">
+        <main className="h-screen w-full flex flex-col lg:flex-row relative bg-white overflow-hidden font-sans">
 
-            {/* Background Grid Structure */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#37415130_1px,transparent_1px),linear-gradient(to_bottom,#37415130_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_50%,#000_85%,transparent_100%)] pointer-events-none" />
+            {/* LEFT SIDE: Advanced Animated Form (Gamified Grid) */}
+            <div className="w-full lg:w-[45%] h-full overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] flex flex-col justify-center items-center p-8 sm:p-12 lg:p-16 z-20 bg-[#e0f2fe] shadow-[20px_0_40px_rgba(0,0,0,0.03)] relative overflow-hidden">
 
-            {/* Ambient Background Glows - Reduced size to prevent screen overflow */}
-            <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-indigo-600/15 rounded-full blur-[100px] pointer-events-none" />
-            <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-purple-600/15 rounded-full blur-[100px] pointer-events-none" />
+                {/* Light Gamified Grid */}
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#6366f115_1px,transparent_1px),linear-gradient(to_bottom,#6366f115_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none z-0" />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#e0f2fe]/40 to-[#e0f2fe]/90 pointer-events-none z-0" />
 
-            {/* Optimized Card Layout: max-w-md kiya aur padding tight ki taaki laptop screen me fit aaye */}
-            <div className="w-full max-w-md bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] rounded-2xl p-6 sm:p-8 shadow-2xl relative z-10">
+                {/* Ambient Glows */}
+                <div className="absolute top-[10%] left-[-10%] w-[400px] h-[400px] bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none z-0" />
+                <div className="absolute bottom-[10%] right-[-10%] w-[300px] h-[300px] bg-blue-500/10 rounded-full blur-[100px] pointer-events-none z-0" />
 
-                {/* Header Section: Reduced margins and icon sizes */}
-                <div className="flex flex-col items-center mb-6">
-                    <div className="p-2.5 bg-indigo-500/10 rounded-xl border border-indigo-500/20 text-indigo-400 mb-3">
-                        <LogIn className="w-6 h-6" />
+                <div className="w-full max-w-[400px] relative z-10">
+
+                    <div className="mb-10">
+                        <div className="w-14 h-14 bg-blue-50 rounded-2xl border border-blue-100 flex items-center justify-center mb-6 shadow-sm transition-transform hover:scale-105">
+                            <LogIn className="w-7 h-7 text-[#2563EB]" />
+                        </div>
+                        <h1 className="text-4xl font-black text-[#1F2937] tracking-tight mb-3 leading-snug">
+                            Welcome <span className="inline-block ml-1 px-4 py-1 bg-[#2563EB] text-white rounded-xl shadow-lg shadow-blue-500/30 transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-default">Back</span>
+                        </h1>
+                        <p className="text-gray-500 font-medium text-lg">Sign in to your AI interview dashboard.</p>
                     </div>
-                    <h1 className="text-2xl font-extrabold text-white tracking-tight">Welcome Back</h1>
-                    <p className="text-xs text-gray-400 mt-1">Enter your details to sign in</p>
+
+                    <form onSubmit={handleSubmit} className="space-y-6">
+
+                        {/* Animated Light Input: Email */}
+                        <div className="relative group">
+                            <div className="absolute -inset-0.5 bg-gradient-to-r from-[#2563EB] to-indigo-400 rounded-2xl opacity-0 group-focus-within:opacity-20 blur transition duration-500"></div>
+                            <div className="relative flex items-center bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl overflow-hidden transition-all duration-300 group-focus-within:border-[#2563EB]/50 group-focus-within:bg-white">
+                                <input
+                                    onChange={(e) => { setEmail(e.target.value) }}
+                                    type="email"
+                                    id="email"
+                                    className="w-full bg-transparent px-5 pt-8 pb-3 text-[#1F2937] font-bold focus:outline-none peer"
+                                    placeholder=" "
+                                    required
+                                />
+                                <label htmlFor="email" className="absolute left-5 top-4 text-xs font-bold text-gray-400 uppercase tracking-widest transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case peer-focus:top-2 peer-focus:text-[10px] peer-focus:text-[#2563EB] peer-focus:uppercase">
+                                    Email Address
+                                </label>
+                            </div>
+                        </div>
+
+                        {/* Animated Light Input: Password */}
+                        <div className="relative group">
+                            <div className="absolute -inset-0.5 bg-gradient-to-r from-[#2563EB] to-indigo-400 rounded-2xl opacity-0 group-focus-within:opacity-20 blur transition duration-500"></div>
+                            <div className="relative flex items-center bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl overflow-hidden transition-all duration-300 group-focus-within:border-[#2563EB]/50 group-focus-within:bg-white">
+                                <input
+                                    onChange={(e) => { setPassword(e.target.value) }}
+                                    type="password"
+                                    id="password"
+                                    className="w-full bg-transparent px-5 pt-8 pb-3 text-[#1F2937] font-bold focus:outline-none peer"
+                                    placeholder=" "
+                                    required
+                                />
+                                <label htmlFor="password" className="absolute left-5 top-4 text-xs font-bold text-gray-400 uppercase tracking-widest transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case peer-focus:top-2 peer-focus:text-[10px] peer-focus:text-[#2563EB] peer-focus:uppercase">
+                                    Password
+                                </label>
+                            </div>
+                        </div>
+
+                        {error && (
+                            <div className="text-sm font-bold text-rose-600 bg-rose-50 border border-rose-100 px-4 py-3 rounded-xl flex items-center gap-3">
+                                <div className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+                                {error}
+                            </div>
+                        )}
+
+                        <div className="pt-4">
+                            <button className="w-full bg-[#2563EB] hover:bg-blue-700 text-white font-bold text-lg rounded-2xl py-4 transition-all hover:scale-[1.02] shadow-[0_10px_30px_rgba(37,99,235,0.2)] hover:shadow-[0_15px_40px_rgba(37,99,235,0.3)] flex items-center justify-center gap-2 group">
+                                Sign In to Platform
+                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            </button>
+                        </div>
+                    </form>
+
+                    <p className="text-gray-500 text-center mt-10 font-medium">
+                        New to JobFit?{' '}
+                        <Link to={"/register"} className="text-[#1F2937] hover:text-[#2563EB] font-bold transition-colors underline underline-offset-4 decoration-gray-300 hover:decoration-[#2563EB]">
+                            Create an account
+                        </Link>
+                    </p>
                 </div>
+            </div>
 
-                {/* Form: space-y-5 kiya taaki vertical height choti ho */}
-                <form onSubmit={handleSubmit} className="space-y-5">
+            {/* RIGHT SIDE: Dark Sidebar Background + Animated Panels */}
+            <div className="hidden lg:flex w-[55%] h-full relative items-center justify-center overflow-hidden bg-gradient-to-b from-[#0A192F] to-[#11264a]">
 
-                    {/* Email Field */}
-                    <div className="space-y-2">
-                        <label htmlFor="email" className="text-sm font-medium text-gray-200 block">Email Address</label>
-                        <div className="relative flex items-center">
-                            <span className="absolute left-4 text-gray-400 pointer-events-none">
-                                <Mail className="w-4 h-4" />
-                            </span>
-                            <input
-                                onChange={(e) => { setEmail(e.target.value) }}
-                                type="email"
-                                id="email"
-                                name='email'
-                                placeholder='Enter email address'
-                                // py-3 aur text-sm se form clean aur short lagega
-                                className="w-full pl-11 pr-4 py-3 bg-black/20 border border-white/[0.1] rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all duration-200"
-                                required
-                            />
+                {/* Dark Tech Grid */}
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#3b82f615_1px,transparent_1px),linear-gradient(to_bottom,#3b82f615_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none z-0" />
+
+                {/* Animated Glows */}
+                <div className="absolute top-[15%] left-[20%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] mix-blend-screen pointer-events-none animate-[pulse_6s_ease-in-out_infinite]" />
+                <div className="absolute bottom-[15%] right-[10%] w-[400px] h-[400px] bg-indigo-500/20 rounded-full blur-[120px] mix-blend-screen pointer-events-none animate-[pulse_8s_ease-in-out_infinite_reverse]" />
+
+                <div className="relative z-10 w-full max-w-2xl px-12">
+
+                    <div className="mb-12">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 shadow-sm backdrop-blur-md mb-6">
+                            <Sparkles className="w-4 h-4 text-blue-400" />
+                            <span className="text-sm font-bold text-gray-300">Welcome to JobFit AI</span>
                         </div>
+                        <h2 className="text-5xl xl:text-6xl font-black text-white tracking-tighter leading-[1.1]">
+                            Your Dream Job.<br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2563EB] via-indigo-500 to-[#2563EB] bg-[length:200%_auto] animate-gradient">Just one mock away.</span>
+                        </h2>
                     </div>
 
-                    {/* Password Field */}
-                    <div className="space-y-2">
-                        <label htmlFor="password" className="text-sm font-medium text-gray-200 block">Password</label>
-                        <div className="relative flex items-center">
-                            <span className="absolute left-4 text-gray-400 pointer-events-none">
-                                <Lock className="w-4 h-4" />
-                            </span>
-                            <input
-                                onChange={(e) => { setPassword(e.target.value) }}
-                                type="password"
-                                id="password"
-                                name='password'
-                                placeholder='Enter password'
-                                className="w-full pl-11 pr-4 py-3 bg-black/20 border border-white/[0.1] rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all duration-200"
-                                required
-                            />
+                    {/* Floating Dark Glass Panels */}
+                    <div className="relative h-[320px] w-full perspective-1000 mt-8">
+
+                        {/* Primary Panel */}
+                        <div className="absolute top-0 right-4 w-[360px] bg-white/5 border border-white/10 backdrop-blur-2xl p-6 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform -rotate-2 hover:rotate-0 transition-transform duration-500 animate-[bounce_5s_ease-in-out_infinite] z-20">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
+                                        <Target className="w-5 h-5 text-blue-400" />
+                                    </div>
+                                    <div>
+                                        <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">Target Role</div>
+                                        <div className="text-sm font-bold text-white">Frontend Developer</div>
+                                    </div>
+                                </div>
+                                <div className="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-black rounded-full border border-emerald-500/30">
+                                    READY
+                                </div>
+                            </div>
+                            <div className="space-y-3">
+                                <div>
+                                    <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase mb-1.5"><span>Technical Skills</span><span>95%</span></div>
+                                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-blue-500 to-emerald-400 w-[95%]" /></div>
+                                </div>
+                                <div>
+                                    <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase mb-1.5"><span>Communication</span><span>88%</span></div>
+                                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-blue-500 to-indigo-400 w-[88%]" /></div>
+                                </div>
+                            </div>
                         </div>
+
+                        {/* Secondary Panel */}
+                        <div className="absolute top-36 left-4 w-[320px] bg-white/5 border border-white/10 backdrop-blur-2xl p-6 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform rotate-3 hover:rotate-0 transition-transform duration-500 animate-[bounce_6s_ease-in-out_infinite_reverse] z-10">
+                            <div className="flex gap-4">
+                                <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex flex-shrink-0 items-center justify-center border border-purple-500/30">
+                                    <BrainCircuit className="w-6 h-6 text-purple-400" />
+                                </div>
+                                <div>
+                                    <div className="text-xs font-black text-gray-400 uppercase tracking-widest">AI Interviewer</div>
+                                    <div className="text-sm text-gray-300 mt-2 font-medium leading-relaxed">Excellent explanation of React hooks. Let's move on to the next question.</div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
-
-                    {/* Error Message */}
-                    {error && (
-                        <p className="text-xs font-medium text-rose-500 bg-rose-500/10 border border-rose-500/20 rounded-xl py-2.5 px-3 text-center">
-                            {error}
-                        </p>
-                    )}
-
-                    {/* Balanced Login Button */}
-                    <button className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-sm text-white font-bold rounded-xl shadow-lg shadow-indigo-600/10 hover:shadow-indigo-500/20 transition-all duration-200 active:scale-[0.99] pt-1">
-                        Login
-                    </button>
-                </form>
-
-                {/* Footer Link */}
-                <p className="text-sm text-gray-400 text-center mt-6">
-                    Don't have an account?{' '}
-                    <Link to={"/register"} className="text-indigo-400 hover:text-indigo-300 font-medium underline underline-offset-4 transition-colors">
-                        Register
-                    </Link>
-                </p>
+                </div>
             </div>
         </main>
     )

@@ -13,57 +13,57 @@ import Leaderboard from "./features/gamification/pages/Leaderboard";
 
 
 export const router = createBrowserRouter([
-  {
-    path: "/login",
-    element: <Login />
-  },
-  {
-    path: "/register",
-    element: <Register />
-  },
-  {
-    path: "/",
-    element: <Protected><Home /></Protected>
-  },
-  {
-    path: "/interview/:interviewId",
-    element: <Protected><Interview /></Protected>
+ {
+  path: "/login",
+  element: <Login />
+ },
+ {
+  path: "/register",
+  element: <Register />
+ },
+ {
+  path: "/",
+  element: <Protected><Home /></Protected>
+ },
+ {
+  path: "/interview/:interviewId",
+  element: <Protected><Interview /></Protected>
 
-  },
-  {
-    path: "/mock-interview",
-    element:
-    <Protected>
-        <MockSimulator />
-    </Protected>
-  },
-  {
-    path: "/mock-result/:resultId",
-    element:
-    <Protected>
-        <MockResult />
-    </Protected>
-  },
-  {
-    path: "/practice",
-    element:
-    <Protected>
-        <PracticePage />
-    </Protected>
-  },
-  {
-    path: "/practice-result/:sessionId",
-    element:
-    <Protected>
-        <PracticeResultPage />
-    </Protected>
-  },
-  {
-    path: "/leaderboard",
-    element:
-    <Protected>
-        <Leaderboard />
-    </Protected>
-  }
+ },
+ {
+  path: "/mock-interview",
+  element:
+  <Protected>
+    <MockSimulator />
+  </Protected>
+ },
+ {
+  path: "/mock-result/:resultId",
+  element:
+  <Protected>
+    <MockResult />
+  </Protected>
+ },
+ {
+  path: "/practice",
+  element:
+  <Protected>
+    <PracticePage />
+  </Protected>
+ },
+ {
+  path: "/practice-result/:sessionId",
+  element:
+  <Protected>
+    <PracticeResultPage />
+  </Protected>
+ },
+ {
+  path: "/leaderboard",
+  element:
+  <Protected>
+    <Leaderboard />
+  </Protected>
+ }
 
-])
+])

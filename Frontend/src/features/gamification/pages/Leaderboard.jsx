@@ -1,140 +1,174 @@
 import React, { useState, useEffect } from 'react';
 import { fetchLeaderboard } from "../../practice/services/practice.api.js";
-import { Trophy, Medal, Crown, Loader2, ArrowLeft, Award } from 'lucide-react';
+import { Trophy, Medal, Crown, ArrowLeft, Award, User as UserIcon } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import RingLoader from '../../../components/RingLoader';
 
 const Leaderboard = () => {
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const navigate = useNavigate();
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const getLeaderboardData = async () => {
-            try {
-                const response = await fetchLeaderboard();
-                if (response.success) {
-                    setUsers(response.data);
-                }
-            } catch (err) {
-                setError("Leaderboard load karne mein koi dikkat aayi!");
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        getLeaderboardData();
-    }, []);
+  useEffect(() => {
+    const getLeaderboardData = async () => {
+      try {
+        const response = await fetchLeaderboard();
+        if (response.success) {
+          setUsers(response.data);
+        }
+      } catch (err) {
+        setError("Leaderboard load karne mein koi dikkat aayi!");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getLeaderboardData();
+  }, []);
 
-    if (loading) {
-        return <RingLoader title="Loading Leaderboard..." subtitle="Fetching Global Standings" />
-    }
+  if (loading) {
+    return <RingLoader title="Loading Leaderboard..." subtitle="Fetching Global Standings" />
+  }
 
-    // Top 3 users alag se nikalne ke liye for Podium look
-    const topThree = users.slice(0, 3);
-    const restUsers = users.slice(3);
+  // Top 3 users alag se nikalne ke liye for Podium look
+  const topThree = users.slice(0, 3);
+  const restUsers = users.slice(3);
 
-    return (
-        <div className="min-h-screen bg-[#0B0F19] text-white p-6 md:p-12 relative overflow-hidden flex flex-col">
-            {/* Background Grid Structure */}
-            <div className="fixed inset-0 bg-[linear-gradient(to_right,#37415120_1px,transparent_1px),linear-gradient(to_bottom,#37415120_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_45%,#000_85%,transparent_100%)] pointer-events-none z-0" />
-            <div className="fixed top-1/4 left-1/4 w-[500px] h-[300px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none z-0" />
-            <div className="fixed bottom-1/4 right-1/4 w-[400px] h-[300px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none z-0" />
+  // Helper for generating initial avatars
+  const getInitial = (username) => {
+    return username ? username.charAt(0).toUpperCase() : '?';
+  };
 
-            <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col flex-1">
-                {/* Header section */}
-                <div className="flex items-center gap-4 mb-10">
-                    <button onClick={() => navigate(-1)} className="p-2 text-gray-400 hover:text-white hover:bg-white/[0.05] rounded-xl transition border border-transparent hover:border-white/[0.05]">
-                        <ArrowLeft className="w-5 h-5" />
-                    </button>
-                <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center gap-2">
-                        <Trophy className="text-yellow-500" /> Global Leaderboard
-                    </h1>
-                    <p className="text-gray-400 text-sm">See where you stand among top developers</p>
-                </div>
-            </div>
+  return (
+    <div className="min-h-screen bg-[#e0f2fe] text-[#1F2937] p-6 md:p-12 relative overflow-hidden flex flex-col z-0">
 
-            {error && (
-                <div className="bg-red-500/10 border border-red-500 text-red-400 p-4 rounded-lg mb-6 text-center">
-                    {error}
-                </div>
-            )}
+      {/* Gamified Background Grid - Intensified */}
+      <div className="fixed inset-0 bg-[linear-gradient(to_right,#6366f125_1px,transparent_1px),linear-gradient(to_bottom,#6366f125_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none z-0" />
+      <div className="fixed inset-0 bg-gradient-to-b from-transparent via-[#e0f2fe]/20 to-[#e0f2fe]/90 pointer-events-none z-0" />
 
-            {/* 🏆 TOP 3 PODIUM DISPLAY */}
-            {topThree.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 items-end max-w-4xl mx-auto relative z-10 w-full mt-4">
-                    {/* Rank 2 (Left or mid adjustment) */}
-                    {topThree[1] && (
-                        <div className="bg-white/[0.02] backdrop-blur-xl border border-white/[0.06] hover:border-white/[0.1] p-6 rounded-3xl flex flex-col items-center order-2 md:order-1 h-48 justify-center relative transition-all duration-300 hover:-translate-y-1 shadow-lg shadow-black/20">
-                            <Medal className="w-10 h-10 text-slate-300 absolute -top-5 drop-shadow-md" />
-                            <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest mt-2">Rank 2</span>
-                            <h3 className="text-lg font-bold mt-2 truncate w-full text-center text-white">{topThree[1].username || "Unknown Developer"}</h3>
-                            <p className="text-indigo-400 font-extrabold mt-1 text-xl">{topThree[1].totalPoints} <span className="text-xs text-indigo-500/70 font-medium">Pts</span></p>
-                            <span className="text-[10px] text-gray-500 mt-2 font-semibold uppercase tracking-wider">{topThree[1].practiceSessionsCompleted || 0} Sessions</span>
-                        </div>
-                    )}
+      {/* Ambient Gamified Glows - Intensified */}
+      <div className="fixed top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-yellow-400/35 rounded-full blur-[120px] pointer-events-none z-0" />
+      <div className="fixed top-[20%] left-[-10%] w-[500px] h-[500px] bg-blue-600/25 rounded-full blur-[100px] pointer-events-none z-0" />
+      <div className="fixed bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-purple-500/25 rounded-full blur-[120px] pointer-events-none z-0" />
 
-                    {/* Rank 1 (Center - Always Highlighted & Bigger) */}
-                    {topThree[0] && (
-                        <div className="bg-gradient-to-b from-yellow-500/10 to-white/[0.02] backdrop-blur-xl border border-yellow-500/30 hover:border-yellow-400/50 p-8 rounded-3xl flex flex-col items-center order-1 md:order-2 h-56 justify-center relative shadow-[0_0_40px_rgba(234,179,8,0.1)] hover:shadow-[0_0_50px_rgba(234,179,8,0.15)] transition-all duration-300 hover:-translate-y-1.5 z-10">
-                            <Crown className="w-14 h-14 text-yellow-400 absolute -top-8 animate-bounce drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" />
-                            <span className="text-[10px] font-black uppercase text-yellow-500 tracking-widest mt-3">Champion</span>
-                            <h3 className="text-2xl font-black mt-2 truncate w-full text-center text-yellow-400 drop-shadow-sm">{topThree[0].username || "Unknown Developer"}</h3>
-                            <p className="text-3xl font-black text-white mt-1 drop-shadow-md">{topThree[0].totalPoints} <span className="text-sm text-yellow-500/70 font-medium">Pts</span></p>
-                            <span className="text-[10px] text-yellow-500/60 mt-2 font-semibold uppercase tracking-wider">{topThree[0].practiceSessionsCompleted || 0} Sessions</span>
-                        </div>
-                    )}
+      <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col flex-1">
+        {/* Header section */}
+        <div className="flex flex-col items-center justify-center text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <button onClick={() => navigate(-1)} className="absolute left-0 top-0 md:top-2 p-2 text-[#6B7280] hover:text-[#1F2937] hover:bg-white/50 rounded-xl transition-all shadow-sm bg-white/30 backdrop-blur-md border border-white/50">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
 
-                    {/* Rank 3 (Right) */}
-                    {topThree[2] && (
-                        <div className="bg-white/[0.02] backdrop-blur-xl border border-white/[0.06] hover:border-white/[0.1] p-6 rounded-3xl flex flex-col items-center order-3 h-44 justify-center relative transition-all duration-300 hover:-translate-y-1 shadow-lg shadow-black/20">
-                            <Award className="w-10 h-10 text-amber-600 absolute -top-5 drop-shadow-md" />
-                            <span className="text-[10px] font-black uppercase text-amber-600/70 tracking-widest mt-2">Rank 3</span>
-                            <h3 className="text-lg font-bold mt-2 truncate w-full text-center text-white">{topThree[2].username || "Unknown Developer"}</h3>
-                            <p className="text-purple-400 font-extrabold mt-1 text-xl">{topThree[2].totalPoints} <span className="text-xs text-purple-500/70 font-medium">Pts</span></p>
-                            <span className="text-[10px] text-gray-500 mt-2 font-semibold uppercase tracking-wider">{topThree[2].practiceSessionsCompleted || 0} Sessions</span>
-                        </div>
-                    )}
-                </div>
-            )}
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-[#2563EB] mb-4 shadow-sm mt-8 md:mt-0">
+            <Trophy className="w-3 h-3 text-yellow-500" />
+            <span className="text-[10px] font-bold uppercase tracking-widest">Global Rankings</span>
+          </div>
 
-            {/* 📋 REST OF THE USERS LIST */}
-            <div className="max-w-4xl mx-auto w-full bg-white/[0.02] backdrop-blur-xl border border-white/[0.06] rounded-3xl overflow-hidden shadow-2xl relative z-10 mb-8 flex-1">
-                <div className="grid grid-cols-12 p-4 md:p-5 border-b border-white/[0.06] bg-white/[0.02] text-gray-500 text-[10px] font-black uppercase tracking-widest sticky top-0 backdrop-blur-md">
-                    <div className="col-span-2 text-center">Rank</div>
-                    <div className="col-span-6">Developer</div>
-                    <div className="col-span-2 text-center hidden sm:block">Sessions</div>
-                    <div className="col-span-4 sm:col-span-2 text-right pr-4">Points</div>
-                </div>
-
-                {restUsers.length === 0 && topThree.length <= 3 && restUsers.length === 0 && (
-                    <div className="p-12 text-center text-gray-500 text-sm font-medium">No more developers listed yet. Keep practicing!</div>
-                )}
-
-                <div className="divide-y divide-white/[0.04]">
-                    {restUsers.map((user, index) => (
-                        <div key={user._id} className="grid grid-cols-12 p-4 md:p-5 items-center hover:bg-white/[0.02] transition-colors duration-200 text-sm group">
-                            <div className="col-span-2 text-center font-black text-gray-500 group-hover:text-gray-400 transition-colors">
-                                #{index + 4}
-                            </div>
-                            <div className="col-span-6 font-bold text-gray-300 group-hover:text-white transition-colors truncate pr-2">
-                                {user.username || "Unknown Developer"}
-                            </div>
-                            <div className="col-span-2 text-center text-gray-500 font-medium hidden sm:block">
-                                {user.practiceSessionsCompleted || 0}
-                            </div>
-                            <div className="col-span-4 sm:col-span-2 text-right font-black text-indigo-400 pr-4">
-                                {user.totalPoints}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-            </div>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-[#1F2937] tracking-tight leading-tight">
+            Hall of <span className="inline-block ml-1 px-4 py-1 bg-[#2563EB] text-white rounded-xl shadow-lg shadow-blue-500/30 transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-default">Fame</span>
+          </h1>
+          <p className="text-[#4B5563] text-sm md:text-base mt-3 max-w-lg font-medium mx-auto">See where you stand among the top developers worldwide.</p>
         </div>
-    );
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl mb-6 text-center text-sm font-medium shadow-sm animate-in fade-in">
+            {error}
+          </div>
+        )}
+
+        {/* 🏆 TOP 3 PODIUM DISPLAY */}
+        {topThree.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 items-end max-w-4xl mx-auto relative z-10 w-full animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100 fill-mode-both">
+
+            {/* Rank 2 (Silver) */}
+            {topThree[1] && (
+              <div className="bg-[#FFFFFF] border border-[#E2E8F0] hover:border-slate-300 p-6 rounded-3xl flex flex-col items-center order-2 md:order-1 h-56 justify-center relative transition-all duration-300 hover:-translate-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] group">
+                <Medal className="w-10 h-10 text-slate-400 absolute -top-5 drop-shadow-md group-hover:scale-110 transition-transform" />
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 border-2 border-white shadow-md flex items-center justify-center mb-3">
+                  <span className="text-2xl font-black text-slate-500">{getInitial(topThree[1].username)}</span>
+                </div>
+                <h3 className="text-lg font-bold truncate w-full text-center text-[#1F2937] group-hover:text-[#2563EB] transition-colors">{topThree[1].username || "Unknown"}</h3>
+                <p className="text-slate-600 font-extrabold mt-1 text-xl">{topThree[1].totalPoints} <span className="text-xs text-slate-400 font-medium">Pts</span></p>
+                <span className="text-[10px] text-[#6B7280] mt-2 font-bold uppercase tracking-wider bg-slate-50 px-2 py-1 rounded-lg">{topThree[1].practiceSessionsCompleted || 0} Sessions</span>
+              </div>
+            )}
+
+            {/* Rank 1 (Gold - Champion) */}
+            {topThree[0] && (
+              <div className="bg-gradient-to-b from-[#FEFCE8] to-[#FFFFFF] border-2 border-yellow-400/50 hover:border-yellow-400 p-8 rounded-3xl flex flex-col items-center order-1 md:order-2 h-64 justify-center relative shadow-[0_12px_40px_rgba(234,179,8,0.15)] hover:shadow-[0_20px_50px_rgba(234,179,8,0.25)] transition-all duration-300 hover:-translate-y-2 z-10 group">
+                <Crown className="w-14 h-14 text-yellow-500 absolute -top-8 animate-bounce drop-shadow-[0_0_15px_rgba(234,179,8,0.4)]" />
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-300 to-yellow-500 border-4 border-white shadow-lg flex items-center justify-center mb-4 relative">
+                  <div className="absolute inset-0 rounded-full bg-yellow-400 blur-md opacity-40 group-hover:opacity-70 transition-opacity" />
+                  <span className="text-3xl font-black text-white relative z-10 drop-shadow-md">{getInitial(topThree[0].username)}</span>
+                </div>
+                <h3 className="text-2xl font-black truncate w-full text-center text-[#1F2937] group-hover:text-yellow-600 transition-colors">{topThree[0].username || "Unknown"}</h3>
+                <p className="text-3xl font-black text-yellow-600 mt-1 drop-shadow-sm">{topThree[0].totalPoints} <span className="text-sm text-yellow-500 font-medium">Pts</span></p>
+                <span className="text-[10px] text-yellow-600/80 mt-2 font-bold uppercase tracking-wider bg-yellow-500/10 px-3 py-1 rounded-full">{topThree[0].practiceSessionsCompleted || 0} Sessions</span>
+              </div>
+            )}
+
+            {/* Rank 3 (Bronze) */}
+            {topThree[2] && (
+              <div className="bg-[#FFFFFF] border border-[#E2E8F0] hover:border-amber-300/60 p-6 rounded-3xl flex flex-col items-center order-3 h-52 justify-center relative transition-all duration-300 hover:-translate-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] group">
+                <Award className="w-10 h-10 text-amber-500 absolute -top-5 drop-shadow-md group-hover:scale-110 transition-transform" />
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 border-2 border-white shadow-md flex items-center justify-center mb-3">
+                  <span className="text-2xl font-black text-amber-700">{getInitial(topThree[2].username)}</span>
+                </div>
+                <h3 className="text-lg font-bold truncate w-full text-center text-[#1F2937] group-hover:text-amber-600 transition-colors">{topThree[2].username || "Unknown"}</h3>
+                <p className="text-amber-600 font-extrabold mt-1 text-xl">{topThree[2].totalPoints} <span className="text-xs text-amber-500/70 font-medium">Pts</span></p>
+                <span className="text-[10px] text-[#6B7280] mt-2 font-bold uppercase tracking-wider bg-amber-50 px-2 py-1 rounded-lg">{topThree[2].practiceSessionsCompleted || 0} Sessions</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 📋 REST OF THE USERS LIST */}
+        <div className="max-w-4xl mx-auto w-full bg-[#FFFFFF] border border-[#E2E8F0] rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative z-10 mb-8 flex-1 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300 fill-mode-both">
+          <div className="grid grid-cols-12 p-4 md:p-6 border-b border-[#E2E8F0] bg-[#F8FAFC] text-[#6B7280] text-[10px] font-bold uppercase tracking-widest sticky top-0 z-10 shadow-sm">
+            <div className="col-span-2 text-center">Rank</div>
+            <div className="col-span-6">Developer</div>
+            <div className="col-span-2 text-center hidden sm:block">Sessions</div>
+            <div className="col-span-4 sm:col-span-2 text-right pr-4">Points</div>
+          </div>
+
+          {restUsers.length === 0 && topThree.length <= 3 && restUsers.length === 0 && (
+            <div className="p-12 text-center flex flex-col items-center justify-center">
+              <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+                <UserIcon className="w-8 h-8 text-blue-200" />
+              </div>
+              <p className="text-[#6B7280] text-sm font-medium">No more developers listed yet. Keep practicing to climb the ranks!</p>
+            </div>
+          )}
+
+          <div className="divide-y divide-[#E2E8F0]">
+            {restUsers.map((user, index) => (
+              <div key={user._id} className="grid grid-cols-12 p-4 md:p-5 items-center transition-all duration-200 text-sm hover:bg-slate-50 group cursor-default">
+                <div className="col-span-2 text-center font-bold text-[#6B7280]">
+                  #{index + 4}
+                </div>
+                <div className="col-span-6 font-bold text-[#1F2937] flex items-center gap-3 pr-2">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-100 to-blue-100 text-[#2563EB] flex items-center justify-center flex-shrink-0 text-xs font-black shadow-sm">
+                    {getInitial(user.username)}
+                  </div>
+                  <span className="truncate group-hover:text-[#2563EB] transition-colors">{user.username || "Unknown Developer"}</span>
+                </div>
+                <div className="col-span-2 flex justify-center hidden sm:flex">
+                   <span className="px-2.5 py-1 bg-slate-100 text-[#4B5563] text-xs font-semibold rounded-md border border-[#E2E8F0]">
+                      {user.practiceSessionsCompleted || 0}
+                   </span>
+                </div>
+                <div className="col-span-4 sm:col-span-2 flex justify-end pr-4">
+                   <span className="px-3 py-1 bg-blue-50 text-[#2563EB] text-xs font-black rounded-lg border border-blue-100 shadow-sm">
+                      {user.totalPoints}
+                   </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Leaderboard;

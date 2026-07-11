@@ -9,6 +9,7 @@ const PracticeQuestionSchema = new mongoose.Schema({
         enum: ["subjective", "mcq", "msq"] // Strictly teenon formats accept honge
     },
     topic: { type: String, required: true },
+    difficulty: { type: String, enum: ["easy", "medium", "hard"] },
     question: { type: String, required: true },
     
     // MCQ/MSQ ke liye options array hoga, subjective ke liye null rahega
@@ -40,6 +41,12 @@ const PracticeSessionSchema = new mongoose.Schema({
         type: [String], // Array of strings jaise ['html', 'css', 'dsa']
         required: true
     },
+    topicsWithDifficulty: [
+        {
+            topic: { type: String, required: true },
+            difficulty: { type: String, enum: ["easy", "medium", "hard"], default: "medium" }
+        }
+    ],
     // Gemini dwara generated 10 questions yaha store honge
     questions: [PracticeQuestionSchema],
     
@@ -50,6 +57,7 @@ const PracticeSessionSchema = new mongoose.Schema({
             // Flexible kyuki user ka answer string bhi ho skta h (Subjective/MCQ) aur array bhi (MSQ)
             answer: { type: mongoose.Schema.Types.Mixed }, 
             isCorrect: { type: Boolean, default: null }, // Only for MCQ/MSQ (Auto evaluate ho skta h)
+            score: { type: Number, default: 0 }, // Subjective aur partial marking ke liye
             feedback: { type: String, default: null } // Gemini se aane wala feedback for individual question
         }
     ],

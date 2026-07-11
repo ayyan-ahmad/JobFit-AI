@@ -9,25 +9,28 @@ const { updateUserPoints } = require("./gamification.controller");
  */
 const startPracticeSession = async (req, res) => {
     try {
-        const { topics } = req.body;
+        const { topicsWithDifficulty } = req.body;
 
         // Validation: Check if topics are provided and it's a non-empty array
-        if (!topics || !Array.isArray(topics) || topics.length === 0) {
+        if (!topicsWithDifficulty || !Array.isArray(topicsWithDifficulty) || topicsWithDifficulty.length === 0) {
             return res.status(400).json({ 
                 success: false, 
                 message: "Choose at least choose one topic!"
             });
         }
 
+        const topics = topicsWithDifficulty.map(t => t.topic);
+
         console.log(`Generating 10 questions for selected topics: ${topics.join(", ")}...`);
 
         // 1. Gemini Se Dynamic Questions Fetch Karo (Using our custom practice AI service)
-        const generatedQuestions = await generateCustomPracticeQuestions({ topics });
+        const generatedQuestions = await generateCustomPracticeQuestions({ topicsWithDifficulty });
 
         // 2. Database mein naya practice session create karo
         const newSession = new PracticeSession({
             userId: req.user.id, // User tracking ke liye
             selectedTopics: topics,
+            topicsWithDifficulty,
             questions: generatedQuestions,
             userAnswers: [], // Starting empty, answers baad me submit honge
             status: "created"
@@ -45,6 +48,7 @@ const startPracticeSession = async (req, res) => {
                 id: q.id,
                 type: q.type,
                 topic: q.topic,
+                difficulty: q.difficulty,
                 question: q.question,
                 options: q.options // Contains null for subjective, and 4 choices for MCQ/MSQ
             }))
@@ -83,6 +87,7 @@ const evaluateSessionAnswers = async (req, res) => {
                 questionId: ua.questionId,
                 answer: ua.answer,
                 isCorrect: match ? match.isCorrect : false,
+                score: match ? (match.score !== undefined ? match.score : (match.isCorrect ? 1 : 0)) : 0,
                 feedback: match ? match.feedback : "No feedback generated."
             };
         });
@@ -97,8 +102,8 @@ const evaluateSessionAnswers = async (req, res) => {
         await session.save();
 
         // --- UPDATE GAMIFICATION POINTS ---
-        // Give the user points based on their score
-        await updateUserPoints(req.user.id, aiEvaluation.totalScore);
+        // Give the user points based on their score and difficulty
+        await updateUserPoints(req.user.id, aiEvaluation.totalScore, session.topicsWithDifficulty);
 
         // 4. Send metrics directly to dashboard scoreboard UI
         return res.status(200).json({

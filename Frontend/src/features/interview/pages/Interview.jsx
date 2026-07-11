@@ -53,7 +53,7 @@ const Toast = ({ toast, onClose }) => {
         >
             {config.icon}
             <p className={`text-sm font-medium leading-snug flex-1 ${config.text}`}>{toast.message}</p>
-            <button onClick={onClose} className="text-gray-500 hover:text-gray-300 transition-colors shrink-0 mt-0.5">
+            <button onClick={onClose} className="text-[#6B7280] hover:text-[#1F2937] transition-colors shrink-0 mt-0.5">
                 <X className="w-3.5 h-3.5" />
             </button>
             {/* Progress bar */}
@@ -64,15 +64,15 @@ const Toast = ({ toast, onClose }) => {
                 />
             </div>
             <style>{`
-                @keyframes slideInRight {
-                    from { opacity: 0; transform: translateX(60px) scale(0.95); }
-                    to   { opacity: 1; transform: translateX(0)   scale(1); }
-                }
-                @keyframes shrinkBar {
-                    from { width: 100%; }
-                    to   { width: 0%; }
-                }
-            `}</style>
+        @keyframes slideInRight {
+          from { opacity: 0; transform: translateX(60px) scale(0.95); }
+          to  { opacity: 1; transform: translateX(0)  scale(1); }
+        }
+        @keyframes shrinkBar {
+          from { width: 100%; }
+          to  { width: 0%; }
+        }
+      `}</style>
         </div>
     )
 }
@@ -81,35 +81,35 @@ const Toast = ({ toast, onClose }) => {
 const QuestionCard = ({ item, index }) => {
     const [open, setOpen] = useState(false)
     return (
-        <div className="bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.1] rounded-xl overflow-hidden transition-all duration-200">
+        <div className="bg-[#FFFFFF] border border-[#E2E8F0] hover:border-indigo-300 rounded-xl overflow-hidden transition-all duration-200 shadow-sm hover:shadow-md">
             <div
-                className="p-4 flex items-start justify-between gap-4 cursor-pointer select-none bg-white/[0.01] hover:bg-white/[0.03]"
+                className="p-4 flex items-start justify-between gap-4 cursor-pointer select-none bg-[#FFFFFF] hover:bg-slate-50 transition-colors"
                 onClick={() => setOpen(o => !o)}
             >
                 <div className="flex items-start gap-3">
-                    <span className="text-xs font-mono font-bold px-2 py-0.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded mt-0.5">
+                    <span className="text-xs font-black px-2 py-0.5 bg-[#2563EB] text-white rounded mt-0.5 shadow-sm">
                         Q{index + 1}
                     </span>
-                    <p className="text-sm font-semibold text-white leading-relaxed">{item.question}</p>
+                    <p className="text-sm font-semibold text-[#1F2937] leading-relaxed">{item.question}</p>
                 </div>
-                <span className={`text-gray-400 shrink-0 transition-transform duration-200 mt-1 ${open ? 'rotate-180 text-indigo-400' : ''}`}>
-                    <ChevronDown className="w-4 h-4" />
+                <span className={`text-[#6B7280] shrink-0 transition-transform duration-200 mt-1 ${open ? 'rotate-180 text-[#2563EB]' : ''}`}>
+                    <ChevronDown className="w-5 h-5" />
                 </span>
             </div>
 
             {open && (
-                <div className="p-4 bg-black/20 border-t border-white/[0.04] space-y-3.5 text-xs md:text-sm">
-                    <div className="space-y-1">
-                        <span className="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded">
+                <div className="p-5 bg-slate-50/80 border-t border-[#E2E8F0] space-y-4 text-xs md:text-sm">
+                    <div className="space-y-2">
+                        <span className="inline-block text-[10px] font-black uppercase tracking-widest px-2.5 py-1 bg-amber-50 text-amber-600 border border-amber-200 rounded-md">
                             Intention
                         </span>
-                        <p className="text-gray-400 leading-relaxed pl-1">{item.intention}</p>
+                        <p className="text-[#4B5563] leading-relaxed px-1">{item.intention}</p>
                     </div>
-                    <div className="space-y-1">
-                        <span className="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded">
+                    <div className="space-y-2">
+                        <span className="inline-block text-[10px] font-black uppercase tracking-widest px-2.5 py-1 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-md">
                             Model Answer
                         </span>
-                        <p className="text-gray-300 leading-relaxed bg-black/30 p-3 rounded-lg border border-white/[0.02]">
+                        <p className="text-[#1F2937] leading-relaxed bg-[#FFFFFF] p-4 rounded-xl border border-[#E2E8F0] shadow-sm">
                             {item.answer}
                         </p>
                     </div>
@@ -145,44 +145,44 @@ const RoadMapDay = ({ day, interviewId, setToast }) => {
     };
 
     return (
-        <div className={`bg-white/[0.02] border transition-all duration-300 rounded-xl p-4 space-y-3 ${isCompleted ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-white/[0.06]'
+        <div className={`bg-[#FFFFFF] border transition-all duration-300 rounded-xl p-5 space-y-4 shadow-sm hover:shadow-md ${isCompleted ? 'border-emerald-200 bg-emerald-50/30' : 'border-[#E2E8F0]'
             }`}>
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <span className={`text-xs font-bold px-2.5 py-1 rounded-md border ${isCompleted
-                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                        : 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                    <span className={`text-xs font-black px-3 py-1 rounded-md border tracking-widest uppercase ${isCompleted
+                        ? 'bg-emerald-100 text-emerald-600 border-emerald-200'
+                        : 'bg-indigo-50 text-indigo-600 border-indigo-200'
                         }`}>
                         Day {day.day}
                     </span>
-                    <h3 className={`text-sm md:text-base font-bold tracking-wide ${isCompleted ? 'text-gray-500 line-through' : 'text-white'
+                    <h3 className={`text-sm md:text-base font-extrabold tracking-wide ${isCompleted ? 'text-[#6B7280] line-through' : 'text-[#1F2937]'
                         }`}>
                         {day.focus}
                     </h3>
                 </div>
 
                 {/* Interactive Custom Checkbox */}
-                <label className="flex items-center cursor-pointer relative">
+                <label className="flex items-center cursor-pointer relative group">
                     <input
                         type="checkbox"
                         checked={isCompleted}
                         onChange={handleToggle}
                         className="peer sr-only"
                     />
-                    <div className={`w-5 h-5 rounded flex items-center justify-center transition-all duration-200 border-2 ${isCompleted
+                    <div className={`w-6 h-6 rounded flex items-center justify-center transition-all duration-200 border-2 shadow-sm group-hover:scale-105 ${isCompleted
                         ? 'bg-emerald-500 border-emerald-500'
-                        : 'border-gray-500 hover:border-indigo-400 bg-transparent'
+                        : 'border-slate-300 hover:border-[#2563EB] bg-white'
                         }`}>
-                        {isCompleted && <CheckCircle className="w-3.5 h-3.5 text-white" />}
+                        {isCompleted && <CheckCircle className="w-4 h-4 text-white" />}
                     </div>
                 </label>
             </div>
 
-            <ul className="space-y-2 pl-1">
+            <ul className="space-y-2.5 pl-1">
                 {day.tasks.map((task, i) => (
-                    <li key={i} className={`text-xs md:text-sm flex items-start gap-2.5 ${isCompleted ? 'text-gray-600' : 'text-gray-400'
+                    <li key={i} className={`text-xs md:text-sm flex items-start gap-3 ${isCompleted ? 'text-[#6B7280]' : 'text-[#4B5563] font-medium'
                         }`}>
-                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-2 ${isCompleted ? 'bg-emerald-500/40' : 'bg-purple-400/70'
+                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-2 ${isCompleted ? 'bg-emerald-400' : 'bg-[#2563EB]'
                             }`} />
                         <span className="leading-relaxed">{task}</span>
                     </li>
@@ -216,27 +216,29 @@ const Interview = () => {
             ...report.behavioralQuestions.map(q => ({ question: q.question }))
         ];
 
-        // 2. Mix karke top 5 questions nikal lo taaki interview lamba na ho
-        const interviewQuestions = allQuestions.slice(0, 5);
+        // 2. Mix karke top 10 questions nikal lo taaki interview standard size ka ho
+        const interviewQuestions = allQuestions.slice(0, 10);
 
         // 3. Mock Simulator route par data bhejte hue redirect karo
         navigate('/mock-interview', { state: { questions: interviewQuestions } });
     };
     // ------------------------------------
 
-    if (loading || !report) {
+    if (!report) {
         return <RingLoader title="Loading your interview plan..." subtitle="Preparing your personalized strategy" />
     }
 
     return (
-        <div className="min-h-screen w-full bg-[#0B0F19] text-gray-100 relative overflow-x-hidden flex flex-col justify-between">
+        <div className="min-h-screen w-full bg-[#e0f2fe] text-[#1F2937] relative overflow-x-hidden flex flex-col justify-between">
 
-            {/* Background Grid Structure */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#37415115_1px,transparent_1px),linear-gradient(to_bottom,#37415115_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_45%,#000_85%,transparent_100%)] pointer-events-none" />
+
+            {/* Gamified Background Grid */}
+            <div className="fixed inset-0 bg-[linear-gradient(to_right,#6366f115_1px,transparent_1px),linear-gradient(to_bottom,#6366f115_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none z-0" />
+            <div className="fixed inset-0 bg-gradient-to-b from-transparent via-[#e0f2fe]/20 to-[#e0f2fe]/90 pointer-events-none z-0" />
 
             {/* Ambient Background Glows */}
-            <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-indigo-600/10 rounded-full blur-[110px] pointer-events-none" />
-            <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-600/10 rounded-full blur-[110px] pointer-events-none" />
+            <div className="fixed top-6 left-1/2 -translate-x-1/2 w-[500px] h-[250px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none z-0" />
+            <div className="fixed top-1/3 right-10 w-80 h-80 bg-purple-600/10 rounded-full blur-[110px] pointer-events-none z-0" />
 
             {/* Layout Wrapper */}
             <div className="relative z-10 w-full max-w-6xl mx-auto px-4 md:px-6 py-6 flex-1 flex flex-col justify-center">
@@ -245,31 +247,30 @@ const Interview = () => {
                 <div className="mb-4">
                     <button
                         onClick={() => navigate('/')}
-                        className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-white transition-colors group"
+                        className="flex items-center gap-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-4 py-2 rounded-xl transition-all shadow-md text-sm font-bold shadow-blue-500/20 w-fit"
                     >
-                        <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-                        Back to Home
+                        <ArrowLeft className="w-4 h-4" /> Back to Dashboard
                     </button>
                 </div>
 
                 {/* Dashboard Flex/Grid Container */}
-                <div className="w-full bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-white/[0.06]">
+                <div className="w-full bg-[#FFFFFF] border border-[#E2E8F0] rounded-3xl shadow-xl shadow-black/5 overflow-hidden grid grid-cols-1 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-[#E2E8F0]">
 
                     {/* ── Left Nav Navigation Panel ── */}
-                    <nav className="p-4 md:p-6 flex flex-col justify-between gap-6 bg-black/10">
+                    <nav className="p-4 md:p-6 flex flex-col justify-between gap-6 bg-slate-50/50">
                         <div className="space-y-4">
-                            <p className="text-[10px] font-bold text-gray-500 tracking-wider uppercase pl-2">Sections</p>
+                            <p className="text-[10px] font-bold text-[#6B7280] tracking-wider uppercase pl-2">Sections</p>
                             <div className="space-y-1.5">
                                 {NAV_ITEMS.map(item => (
                                     <button
                                         key={item.id}
                                         className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs md:text-sm font-semibold transition-all duration-200 ${activeNav === item.id
-                                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                                            : 'text-gray-400 hover:text-gray-200 hover:bg-white/[0.03]'
+                                            ? 'bg-[#2563EB] text-white shadow-lg shadow-blue-500/20'
+                                            : 'text-[#6B7280] hover:text-[#1F2937] hover:bg-white shadow-sm hover:shadow-md'
                                             }`}
                                         onClick={() => setActiveNav(item.id)}
                                     >
-                                        <span className={activeNav === item.id ? 'text-white' : 'text-gray-400'}>{item.icon}</span>
+                                        <span className={activeNav === item.id ? 'text-white' : 'text-[#6B7280]'}>{item.icon}</span>
                                         {item.label}
                                     </button>
                                 ))}
@@ -293,7 +294,7 @@ const Interview = () => {
                                 }
                             }}
                             disabled={loading}
-                            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs md:text-sm font-semibold transition-all duration-200 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-600/20 disabled:opacity-50 disabled:cursor-not-allowed group"
+                            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs md:text-sm font-semibold transition-all duration-200 bg-[#FFFFFF] hover:bg-slate-50 text-[#1F2937] border border-[#E2E8F0] shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed group mt-2"
                         >
                             {loading ? (
                                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -305,7 +306,7 @@ const Interview = () => {
                         {/* --- NAYA MOCK INTERVIEW BUTTON YAHAN ADD KARO --- */}
                         <button
                             onClick={handleStartInterview}
-                            className="w-full mt-2 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-200 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/30 hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-600/20 group"
+                            className="w-full mt-2 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-200 bg-[#2563EB] hover:bg-[#1D4ED8] text-white border border-transparent hover:shadow-lg hover:shadow-blue-500/30 group"
                         >
                             <Mic className="w-4 h-4 group-hover:scale-110 transition-transform" />
                             Start AI Interview
@@ -318,13 +319,15 @@ const Interview = () => {
                     <main className="p-5 md:p-8 md:col-span-2 min-h-[24rem] max-h-[32rem] overflow-y-auto custom-scrollbar">
                         {activeNav === 'technical' && (
                             <div className="space-y-4">
-                                <div className="flex items-center justify-between pb-2 border-b border-white/[0.04]">
-                                    <h2 className="text-base md:text-lg font-extrabold text-white">Technical Questions</h2>
-                                    <span className="text-xs font-medium px-2 py-0.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded">
+                                <div className="flex items-center justify-between pb-4 border-b border-[#E2E8F0] mb-4">
+                                    <h2 className="text-base md:text-xl font-extrabold text-[#1F2937] leading-snug">
+                                        Technical <span className="inline-block ml-1 px-3 py-0.5 bg-[#2563EB] text-white rounded-lg shadow-md shadow-blue-500/30 transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-default">Questions</span>
+                                    </h2>
+                                    <span className="text-xs font-black px-2.5 py-1 bg-indigo-50 text-[#2563EB] border border-indigo-100 rounded uppercase tracking-wider">
                                         {report.technicalQuestions.length} Items
                                     </span>
                                 </div>
-                                <div className="space-y-3">
+                                <div className="space-y-4">
                                     {report.technicalQuestions.map((q, i) => (
                                         <QuestionCard key={i} item={q} index={i} />
                                     ))}
@@ -334,13 +337,15 @@ const Interview = () => {
 
                         {activeNav === 'behavioral' && (
                             <div className="space-y-4">
-                                <div className="flex items-center justify-between pb-2 border-b border-white/[0.04]">
-                                    <h2 className="text-base md:text-lg font-extrabold text-white">Behavioral Questions</h2>
-                                    <span className="text-xs font-medium px-2 py-0.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded">
+                                <div className="flex items-center justify-between pb-4 border-b border-[#E2E8F0] mb-4">
+                                    <h2 className="text-base md:text-xl font-extrabold text-[#1F2937] leading-snug">
+                                        Behavioral <span className="inline-block ml-1 px-3 py-0.5 bg-[#2563EB] text-white rounded-lg shadow-md shadow-blue-500/30 transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-default">Questions</span>
+                                    </h2>
+                                    <span className="text-xs font-black px-2.5 py-1 bg-indigo-50 text-[#2563EB] border border-indigo-100 rounded uppercase tracking-wider">
                                         {report.behavioralQuestions.length} Items
                                     </span>
                                 </div>
-                                <div className="space-y-3">
+                                <div className="space-y-4">
                                     {report.behavioralQuestions.map((q, i) => (
                                         <QuestionCard key={i} item={q} index={i} />
                                     ))}
@@ -350,9 +355,11 @@ const Interview = () => {
 
                         {activeNav === 'roadmap' && (
                             <div className="space-y-4">
-                                <div className="flex items-center justify-between pb-2 border-b border-white/[0.04]">
-                                    <h2 className="text-base md:text-lg font-extrabold text-white">Preparation Road Map</h2>
-                                    <span className="text-xs font-medium px-2 py-0.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded">
+                                <div className="flex items-center justify-between pb-4 border-b border-[#E2E8F0] mb-4">
+                                    <h2 className="text-base md:text-xl font-extrabold text-[#1F2937] leading-snug">
+                                        Preparation <span className="inline-block ml-1 px-3 py-0.5 bg-[#2563EB] text-white rounded-lg shadow-md shadow-blue-500/30 transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-default">Road Map</span>
+                                    </h2>
+                                    <span className="text-xs font-black px-2.5 py-1 bg-indigo-50 text-[#2563EB] border border-indigo-100 rounded uppercase tracking-wider">
                                         {report.preparationPlan.length} Days Plan
                                     </span>
                                 </div>
@@ -371,41 +378,41 @@ const Interview = () => {
                     </main>
 
                     {/* ── Right Sidebar Metrics Panel ── */}
-                    <aside className="p-5 md:p-6 flex flex-col gap-6 justify-center bg-black/5">
+                    <aside className="p-5 md:p-6 flex flex-col gap-6 justify-center bg-slate-50/50">
 
                         {/* Match Score Display */}
-                        <div className="text-center p-4 bg-black/20 border border-white/[0.04] rounded-2xl relative overflow-hidden group">
-                            <div className="absolute -top-10 -right-10 w-24 h-24 bg-indigo-600/5 rounded-full blur-xl pointer-events-none" />
-                            <p className="text-[10px] font-bold text-gray-500 tracking-wider uppercase mb-3 flex items-center justify-center gap-1.5">
-                                <Target className="w-3.5 h-3.5 text-gray-400" />
+                        <div className="text-center p-6 bg-[#FFFFFF] border border-[#E2E8F0] rounded-3xl relative overflow-hidden group shadow-sm hover:shadow-md transition-shadow">
+                            <div className="absolute -top-10 -right-10 w-24 h-24 bg-blue-500/10 rounded-full blur-xl pointer-events-none group-hover:scale-150 transition-transform duration-700" />
+                            <p className="text-[10px] font-black text-[#2563EB] tracking-widest uppercase mb-4 flex items-center justify-center gap-1.5">
+                                <Target className="w-4 h-4 text-[#2563EB]" />
                                 Match Score
                             </p>
 
                             <div className="inline-flex items-baseline justify-center gap-0.5 mb-2">
-                                <span className={`text-4xl font-black font-mono tracking-tighter ${report.matchScore >= 80 ? 'text-emerald-400' : report.matchScore >= 60 ? 'text-amber-400' : 'text-rose-400'
+                                <span className={`text-6xl font-black font-mono tracking-tighter drop-shadow-sm ${report.matchScore >= 80 ? 'text-emerald-500' : report.matchScore >= 60 ? 'text-amber-500' : 'text-rose-500'
                                     }`}>
                                     {report.matchScore}
                                 </span>
-                                <span className="text-sm font-bold text-gray-500">%</span>
+                                <span className="text-xl font-bold text-[#6B7280]">%</span>
                             </div>
-                            <p className="text-xs text-gray-400 font-medium">Strong matching matrix</p>
+                            <p className="text-xs text-[#6B7280] font-bold mt-2">Strong matching matrix</p>
                         </div>
 
                         {/* Skill Gaps Module */}
                         <div className="space-y-3">
-                            <p className="text-[10px] font-bold text-gray-500 tracking-wider uppercase pl-1 flex items-center gap-1.5">
-                                <AlertCircle className="w-3.5 h-3.5 text-gray-400" />
+                            <p className="text-[10px] font-black text-[#1F2937] tracking-widest uppercase pl-2 flex items-center gap-1.5">
+                                <AlertCircle className="w-3.5 h-3.5 text-[#2563EB]" />
                                 Skill Gaps
                             </p>
-                            <div className="flex flex-wrap gap-1.5 bg-black/20 p-3 border border-white/[0.04] rounded-2xl min-h-[6rem] content-start">
+                            <div className="flex flex-wrap gap-2 bg-[#FFFFFF] p-4 border border-[#E2E8F0] rounded-2xl min-h-[6rem] content-start shadow-sm">
                                 {report.skillGaps.map((gap, i) => (
                                     <span
                                         key={i}
-                                        className={`text-[11px] font-medium px-2.5 py-1 rounded-md border ${gap.severity === 'high'
-                                            ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                                        className={`text-[10px] font-black px-2.5 py-1 rounded-md border tracking-widest uppercase shadow-sm ${gap.severity === 'high'
+                                            ? 'bg-rose-50 text-rose-600 border-rose-200'
                                             : gap.severity === 'mid'
-                                                ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                                                : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+                                                ? 'bg-amber-50 text-amber-600 border-amber-200'
+                                                : 'bg-indigo-50 text-indigo-600 border-indigo-200'
                                             }`}
                                     >
                                         {gap.skill}
@@ -418,10 +425,10 @@ const Interview = () => {
                 </div>
 
                 {/* Lower Layout Footer */}
-                <footer className="border-t border-white/[0.06] mt-6 pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+                <footer className="border-t border-[#E2E8F0] mt-6 pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#6B7280] font-semibold">
                     <div className="flex gap-4">
-                        <a href="#" className="hover:text-gray-300 transition-colors">Privacy Policy</a>
-                        <a href="#" className="hover:text-gray-300 transition-colors">Terms of Service</a>
+                        <a href="#" className="hover:text-[#1F2937] transition-colors">Privacy Policy</a>
+                        <a href="#" className="hover:text-[#1F2937] transition-colors">Terms of Service</a>
                     </div>
                     <p>&copy; {new Date().getFullYear()} AI Interview Prep Blueprint.</p>
                 </footer>

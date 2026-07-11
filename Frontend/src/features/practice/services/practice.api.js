@@ -17,9 +17,9 @@ apiClient.interceptors.response.use(
  * @param {string[]} topics - Selected topic IDs ka array
  * @returns {{ sessionId: string, questions: object[] }}
  */
-export async function startPracticeSession(topics) {
+export async function startPracticeSession(topicsWithDifficulty) {
   try {
-    const response = await apiClient.post("/api/practice/start", { topics });
+    const response = await apiClient.post("/api/practice/start", { topicsWithDifficulty });
     return response.data;
   } catch (error) {
     console.error("Error starting practice session:", error);

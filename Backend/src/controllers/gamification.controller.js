@@ -22,11 +22,34 @@ const getLeaderboard = async (req, res) => {
 };
 
 // 2. Points update karne ka function (Internal Use/API endpoint dono ke liye)
-const updateUserPoints = async (userId, aiScore) => {
+const updateUserPoints = async (userId, aiScore, topicsWithDifficulty = []) => {
     try {
-        const basePoints = 20; // 10 questions complete karne ke fixed points
-        const performancePoints = Math.round(aiScore || 0); // Gemini ka score
-        const totalEarnedPoints = basePoints + performancePoints;
+        const basePoints = 10; // Sirf participate karne ke liye chota inam
+        const performancePoints = Math.round(aiScore || 0); // Score out of 10
+
+        let totalEarnedPoints = 0;
+
+        if (performancePoints > 0) {
+            // Calculate average difficulty multiplier
+            let totalMultiplier = 0;
+            let count = 0;
+            
+            if (topicsWithDifficulty.length > 0) {
+                topicsWithDifficulty.forEach(t => {
+                    const diff = t.difficulty || 'medium';
+                    totalMultiplier += (diff === 'hard' ? 2 : diff === 'medium' ? 1.5 : 1);
+                    count++;
+                });
+            }
+            
+            const multiplier = count > 0 ? (totalMultiplier / count) : 1.5; // Default to medium (1.5)
+            
+            // Formula: Base (10) + (Performance * 10 * Multiplier)
+            totalEarnedPoints = Math.round(basePoints + (performancePoints * 10 * multiplier));
+        } else {
+            // Zero effort pe zero points (Spam prevention)
+            totalEarnedPoints = 0;
+        }
 
         const updatedUser = await userModel.findByIdAndUpdate( 
             userId,
