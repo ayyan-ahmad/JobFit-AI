@@ -18,7 +18,7 @@ Powered by **Gemini Flash** — analyzes your resume + job description and gener
 Generates a clean, single-page, ATS-optimized resume tailored to the target job — downloaded directly in the browser via **html2pdf.js**.
 
 ### 📧 Daily Email Reminders
-A **cron job** runs every morning at 8 AM (IST) and sends personalized preparation reminder emails for each pending day of the plan. Tracks `reminderSent` to prevent duplicate emails.
+A **cron job** runs every morning at 8 AM (IST) and sends personalized preparation reminder emails for each pending day of the plan using **EmailJS**. Tracks `reminderSent` to prevent duplicate emails.
 
 ### ✔️ Interactive Prep Tracker
 Mark each day of your preparation plan as complete directly from the report page. Uses **optimistic UI updates** for instant feedback.
@@ -61,7 +61,7 @@ All generated reports are saved and accessible from your dashboard.
 | JWT + bcryptjs | Authentication & password hashing |
 | pdf-parse | Extract text from uploaded resume PDFs |
 | Multer | File upload handling (memory storage, 3MB limit) |
-| Nodemailer | Email reminder delivery via Gmail SMTP |
+| EmailJS | Email reminder delivery |
 | node-cron | Scheduled daily reminder job |
 
 
@@ -98,7 +98,7 @@ JobFit AI/
 │       │   └── gamification.routes.js  # /api/gamification/*
 │       └── services/
 │           ├── ai.services.js          # Gemini AI — report + resume generation
-│           └── email.service.js        # Nodemailer reminder emails
+│           └── email.service.js        # EmailJS reminder emails
 │
 └── Frontend/
     └── src/
@@ -154,11 +154,12 @@ GOOGLE_GENAI_API_KEY=your_gemini_api_key
 # Frontend origin (for CORS)
 FRONTEND_URL=http://localhost:5173
 
-# Email Reminders — Gmail SMTP
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_gmail_app_password
+# Email Reminders — EmailJS
+EMAILJS_SERVICE_ID=your_emailjs_service_id
+EMAILJS_TEMPLATE_ID=your_emailjs_template_id
+EMAILJS_USER_ID=your_emailjs_user_id
+EMAILJS_PUBLIC_KEY=your_emailjs_public_key
+EMAILJS_PRIVATE_KEY=your_emailjs_private_key
 ```
 
 > ⚠️ **Never commit your `.env` file.** Ensure `Backend/.env` is listed in `.gitignore`.
@@ -255,7 +256,7 @@ Both **HTTP-only cookie** and **`Authorization: Bearer <token>` header** are acc
 
 - Cron runs **every day at 8:00 AM IST**
 - Queries reports with a prep plan day where `targetDate` matches today, `isCompleted = false`, and `reminderSent = false`
-- Sends a task-list email to the user via Gmail SMTP
+- Sends a task-list email to the user via **EmailJS**
 - Sets `reminderSent = true` after delivery to prevent duplicate sends (idempotent)
 
 ---
