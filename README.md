@@ -23,6 +23,12 @@ A **cron job** runs every morning at 8 AM (IST) and sends personalized preparati
 ### ✔️ Interactive Prep Tracker
 Mark each day of your preparation plan as complete directly from the report page. Uses **optimistic UI updates** for instant feedback.
 
+### 🎙️ AI Mock Interview Simulator
+Take practice mock interviews directly from your customized report. The app picks technical and behavioral questions from your report and simulates an interactive interview.
+
+### 🏆 Gamification & Leaderboard
+Earn points for completing practice sessions. Your AI evaluation score directly translates to points. Track your ranking on a global leaderboard among other users.
+
 ### 🔐 JWT Authentication
 Secure login/register with **HTTP-only cookie** based auth. Works seamlessly across localhost and production environments.
 
@@ -73,7 +79,9 @@ JobFit AI/
 │       │   └── database.js             # MongoDB connection
 │       ├── controllers/
 │       │   ├── auth.controller.js      # Register, Login, Logout, GetMe
-│       │   └── interview.controller.js # Report generation, PDF, plan tracker
+│       │   ├── interview.controller.js # Report generation, PDF, plan tracker
+│       │   ├── practice.controller.js  # Custom practice session, evaluation
+│       │   └── gamification.controller.js # Points update, leaderboard
 │       ├── jobs/
 │       │   └── cronTasks.js            # Daily 8AM IST email reminder cron
 │       ├── middlewares/
@@ -85,7 +93,9 @@ JobFit AI/
 │       │   └── blacklist.model.js      # Logout token blacklist
 │       ├── routes/
 │       │   ├── auth.routes.js          # /api/auth/*
-│       │   └── interview.routes.js     # /api/interview/*
+│       │   ├── interview.routes.js     # /api/interview/*
+│       │   ├── practice.routes.js      # /api/practice/*
+│       │   └── gamification.routes.js  # /api/gamification/*
 │       └── services/
 │           ├── ai.services.js          # Gemini AI — report + resume generation
 │           └── email.service.js        # Nodemailer reminder emails
@@ -211,6 +221,21 @@ http://localhost:5173
 | `POST` | `/resume/pdf/:id` | 🔒 Private | Generate AI-tailored resume HTML for PDF download |
 | `PATCH` | `/report/:id/plan/:day` | 🔒 Private | Toggle completion status of a specific prep plan day |
 
+### Practice — `/api/practice`
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `POST` | `/start` | 🔒 Private | Create custom practice session based on topics |
+| `POST` | `/evaluate` | 🔒 Private | Submit answers to Gemini AI for scoring and feedback |
+| `GET` | `/history` | 🔒 Private | Get user's practice sessions history |
+| `GET` | `/history/:sessionId` | 🔒 Private | Get specific practice session details |
+
+### Gamification — `/api/gamification`
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/leaderboard` | 🔒 Private | Get top 50 users sorted by total points |
+
 ---
 
 ## 🔒 Authentication Flow
@@ -265,6 +290,37 @@ Both **HTTP-only cookie** and **`Authorization: Bearer <token>` header** are acc
 ---
 
 ## 🗂️ Data Model
+
+### User
+
+```
+{
+  username:                    String
+  email:                       String
+  password:                    String
+  totalPoints:                 Number            → Earned from practice sessions
+  practiceSessionsCompleted:   Number
+  createdAt, updatedAt
+}
+```
+
+### PracticeSession
+
+```
+{
+  userId:              ObjectId          → ref: users
+  selectedTopics:      Array<String>
+  questions:           Array<Object>     → AI generated questions
+  userAnswers:         Array<Object>     → User's submitted answers
+  status:              String ("created" | "completed")
+  evaluation: {
+    totalScore:        Number,
+    overallFeedback:   String,
+    completedAt:       Date
+  }
+  createdAt, updatedAt
+}
+```
 
 ### InterviewReport
 
