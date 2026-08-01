@@ -57,7 +57,7 @@ All generated reports are saved and accessible from your dashboard.
 |---|---|
 | Node.js + Express 5 | REST API server |
 | MongoDB + Mongoose | Database & ODM |
-| Google Gemini AI (`gemini-3-flash-preview`) | Interview report + resume generation |
+| Google Gemini AI (`gemini-2.5-flash`) | Interview report + resume generation |
 | JWT + bcryptjs | Authentication & password hashing |
 | pdf-parse | Extract text from uploaded resume PDFs |
 | Multer | File upload handling (memory storage, 3MB limit) |
