@@ -57,7 +57,7 @@ All generated reports are saved and accessible from your dashboard.
 |---|---|
 | Node.js + Express 5 | REST API server |
 | MongoDB + Mongoose | Database & ODM |
-| Google Gemini AI (`gemini-3-flash-preview`) | Interview report + resume generation |
+| Google Gemini AI (`gemini-2.5-flash`) | Interview report + resume generation |
 | JWT + bcryptjs | Authentication & password hashing |
 | pdf-parse | Extract text from uploaded resume PDFs |
 | Multer | File upload handling (memory storage, 3MB limit) |
@@ -339,20 +339,5 @@ Both **HTTP-only cookie** and **`Authorization: Bearer <token>` header** are acc
 
 ---
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/my-feature`
-3. Commit: `git commit -m "feat: add my feature"`
-4. Push: `git push origin feature/my-feature`
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-MIT License — see [LICENSE](LICENSE) for details.
-
----
 
 <p align="center">Built with ❤️ using Google Gemini AI</p>
