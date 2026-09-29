@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router'
 import { useAuth } from '../hooks/useAuth'
-import { LogIn, Target, BrainCircuit, ArrowRight, Sparkles } from 'lucide-react'
-import RingLoader from '../../../components/RingLoader'
+import { LogIn, Target, BrainCircuit, ArrowRight, Sparkles, Loader2 } from 'lucide-react'
 
 const Login = () => {
     const { loading, handleLogin } = useAuth()
@@ -27,9 +26,7 @@ const Login = () => {
         }
     }
 
-    if (loading) {
-        return <RingLoader title="Signing you in..." subtitle="Please wait a moment" />
-    }
+
 
     return (
         <main className="h-screen w-full flex flex-col lg:flex-row relative bg-white overflow-hidden font-sans">
@@ -103,9 +100,18 @@ const Login = () => {
                         )}
 
                         <div className="pt-4">
-                            <button className="w-full bg-[#2563EB] hover:bg-blue-700 text-white font-bold text-lg rounded-2xl py-4 transition-all hover:scale-[1.02] shadow-[0_10px_30px_rgba(37,99,235,0.2)] hover:shadow-[0_15px_40px_rgba(37,99,235,0.3)] flex items-center justify-center gap-2 group">
-                                Sign In to Platform
-                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            <button disabled={loading} className="w-full bg-[#2563EB] hover:bg-blue-700 text-white font-bold text-lg rounded-2xl py-4 transition-all hover:scale-[1.02] shadow-[0_10px_30px_rgba(37,99,235,0.2)] hover:shadow-[0_15px_40px_rgba(37,99,235,0.3)] flex items-center justify-center gap-2 group disabled:opacity-70 disabled:hover:scale-100 disabled:cursor-not-allowed">
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        Signing In...
+                                    </>
+                                ) : (
+                                    <>
+                                        Sign In to Platform
+                                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                    </>
+                                )}
                             </button>
                         </div>
                     </form>
@@ -132,13 +138,10 @@ const Login = () => {
                 <div className="relative z-10 w-full max-w-2xl px-12">
 
                     <div className="mb-12">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 shadow-sm backdrop-blur-md mb-6">
-                            <Sparkles className="w-4 h-4 text-blue-400" />
-                            <span className="text-sm font-bold text-gray-300">Welcome to JobFit AI</span>
-                        </div>
+                        
                         <h2 className="text-5xl xl:text-6xl font-black text-white tracking-tighter leading-[1.1]">
                             Your Dream Job.<br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2563EB] via-indigo-500 to-[#2563EB] bg-[length:200%_auto] animate-gradient">Just one mock away.</span>
+                            <span style={{ color: "#2563EB" }}>Just one mock away.</span>
                         </h2>
                     </div>
 

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useContext } from 'react'
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate } from 'react-router'
-import { Loader2, Briefcase, User, UploadCloud, Info, Sparkles, Trophy, TrendingUp, Target, PlusCircle, History, FileText, LayoutDashboard, LogOut, Menu, X, Crown } from 'lucide-react'
+import { Loader2, Briefcase, User, UploadCloud, Info, Sparkles, Trophy, TrendingUp, Target, PlusCircle, History, FileText, LayoutDashboard, LogOut, Menu, X, Crown, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import RingLoader from '../../../components/RingLoader'
 import { getPracticeHistory } from '../../practice/services/practice.api'
 import { AuthContext } from '../../auth/auth.context'
@@ -15,6 +15,7 @@ const Home = () => {
     const [practiceSessions, setPracticeSessions] = useState([])
     const [activeTab, setActiveTab] = useState('create')
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+    const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true)
     const [selectedFile, setSelectedFile] = useState(null)
     const [isGenerating, setIsGenerating] = useState(false)
     const resumeInputRef = useRef()
@@ -70,86 +71,104 @@ const Home = () => {
             <div className="fixed top-1/3 right-10 w-80 h-80 bg-purple-600/10 rounded-full blur-[110px] pointer-events-none z-0" />
 
             {/* Sidebar (Desktop) */}
-            <aside className="relative z-20 w-72 border-r border-blue-800/30 bg-gradient-to-b from-[#0A192F] to-[#11264a] flex-col hidden lg:flex shrink-0">
-                <div className="p-6 border-b border-blue-800/30 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#3B82F6] flex items-center justify-center shadow-lg shadow-blue-500/20">
-                        <Sparkles className="w-5 h-5 text-white" />
+            {/* Sidebar (Desktop) */}
+            <aside 
+                onMouseEnter={() => setIsDesktopSidebarOpen(true)}
+                onMouseLeave={() => setIsDesktopSidebarOpen(false)}
+                className={`relative z-20 transition-all duration-300 ease-in-out border-r border-blue-800/30 bg-gradient-to-b from-[#0A192F] to-[#11264a] flex-col hidden lg:flex shrink-0 ${isDesktopSidebarOpen ? 'w-72' : 'w-[88px]'} overflow-hidden`}
+            >
+                <div className="p-6 border-b border-blue-800/30 flex items-center overflow-hidden w-[288px]">
+                    <div className="w-11 h-11 bg-white rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.5)] border-2 border-blue-400/40 shrink-0 overflow-hidden">
+                        <img src="/icon.png" alt="JobFit AI Logo" className="w-full h-full object-contain p-1" />
                     </div>
-                    <span className="font-extrabold text-xl text-white tracking-wider">JobFit AI</span>
+                    <div className={`flex items-center whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ${isDesktopSidebarOpen ? 'max-w-[200px] opacity-100 ml-3' : 'max-w-0 opacity-0 ml-0'}`}>
+                        <span className="font-extrabold text-xl text-white tracking-wider flex items-center">
+                            JobFit <span className="inline-block ml-2 px-2.5 py-0.5 bg-[#2563EB] text-white rounded-lg shadow-md shadow-blue-500/40 transform -rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-300 text-lg cursor-default">AI</span>
+                        </span>
+                    </div>
                 </div>
 
-                <nav className="flex-1 p-5 flex flex-col gap-2 overflow-y-auto">
-                    <div className="text-[10px] font-black text-blue-200/60 uppercase tracking-widest mb-2 px-3">Main Actions</div>
+                <nav className="flex-1 p-4 flex flex-col gap-2 overflow-y-auto overflow-x-hidden">
+                    <div className={`text-[10px] font-black text-blue-200/60 uppercase tracking-widest px-3 transition-all duration-300 ease-in-out ${isDesktopSidebarOpen ? 'mb-2 opacity-100 max-h-4' : 'mb-0 opacity-0 max-h-0 overflow-hidden'}`}>Main Actions</div>
 
                     <button
                         onClick={() => setActiveTab('create')}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${activeTab === 'create' ? 'bg-[#3B82F6] text-white shadow-md' : 'text-blue-100/70 hover:bg-white/10 hover:text-white'}`}
+                        className={`flex items-center px-4 py-3 rounded-xl transition-all duration-300 ${isDesktopSidebarOpen ? 'gap-3' : 'gap-0 justify-center'} ${activeTab === 'create' ? 'bg-[#3B82F6] text-white shadow-md' : 'text-blue-100/70 hover:bg-white/10 hover:text-white'}`}
+                        title={!isDesktopSidebarOpen ? "Create Interview Plan" : ""}
                     >
-                        <PlusCircle className={`w-5 h-5 ${activeTab === 'create' ? 'text-white' : 'text-blue-100/70'}`} />
-                        <span className="text-sm font-bold">Create Interview Plan</span>
+                        <PlusCircle className={`w-5 h-5 shrink-0 transition-colors ${activeTab === 'create' ? 'text-white' : 'text-blue-100/70'}`} />
+                        <span className={`text-sm font-bold whitespace-nowrap transition-all duration-300 ease-in-out ${isDesktopSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden'}`}>Create Interview Plan</span>
                     </button>
 
                     <button
                         onClick={() => navigate("/practice")}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-blue-100/70 hover:bg-white/10 hover:text-white group"
+                        className={`flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-blue-100/70 hover:bg-white/10 hover:text-white group ${isDesktopSidebarOpen ? 'gap-3' : 'gap-0 justify-center'}`}
+                        title={!isDesktopSidebarOpen ? "Custom Practice Test" : ""}
                     >
-                        <Target className="w-5 h-5 text-blue-100/70 group-hover:text-white transition-colors" />
-                        <span className="text-sm font-bold group-hover:text-white transition-colors">Custom Practice Test</span>
+                        <Target className="w-5 h-5 shrink-0 text-blue-100/70 group-hover:text-white transition-colors" />
+                        <span className={`text-sm font-bold whitespace-nowrap transition-all duration-300 ease-in-out group-hover:text-white ${isDesktopSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden'}`}>Custom Practice Test</span>
                     </button>
 
                     <button
                         onClick={() => navigate("/leaderboard")}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-blue-100/70 hover:bg-white/10 hover:text-white group"
+                        className={`flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-blue-100/70 hover:bg-white/10 hover:text-white group ${isDesktopSidebarOpen ? 'gap-3' : 'gap-0 justify-center'}`}
+                        title={!isDesktopSidebarOpen ? "Global Leaderboard" : ""}
                     >
-                        <Crown className="w-5 h-5 text-blue-100/70 group-hover:text-white transition-colors" />
-                        <span className="text-sm font-bold group-hover:text-white transition-colors">Global Leaderboard</span>
+                        <Crown className="w-5 h-5 shrink-0 text-blue-100/70 group-hover:text-white transition-colors" />
+                        <span className={`text-sm font-bold whitespace-nowrap transition-all duration-300 ease-in-out group-hover:text-white ${isDesktopSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden'}`}>Global Leaderboard</span>
                     </button>
 
-                    <div className="text-[10px] font-black text-blue-200/60 uppercase tracking-widest mt-8 mb-2 px-3">My History</div>
+                    <div className={`text-[10px] font-black text-blue-200/60 uppercase tracking-widest px-3 transition-all duration-300 ease-in-out ${isDesktopSidebarOpen ? 'mt-6 mb-2 opacity-100 max-h-4' : 'mt-2 mb-0 opacity-0 max-h-0 overflow-hidden'}`}>My History</div>
+                    {!isDesktopSidebarOpen && <div className="border-t border-blue-800/30 w-8 mx-auto my-2"></div>}
 
                     <button
                         onClick={() => setActiveTab('plans')}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${activeTab === 'plans' ? 'bg-[#3B82F6] text-white shadow-md' : 'text-blue-100/70 hover:bg-white/10 hover:text-white'}`}
+                        className={`flex items-center px-4 py-3 rounded-xl transition-all duration-300 ${isDesktopSidebarOpen ? 'gap-3' : 'gap-0 justify-center'} ${activeTab === 'plans' ? 'bg-[#3B82F6] text-white shadow-md' : 'text-blue-100/70 hover:bg-white/10 hover:text-white'}`}
+                        title={!isDesktopSidebarOpen ? "Recent Plans" : ""}
                     >
-                        <Briefcase className={`w-5 h-5 ${activeTab === 'plans' ? 'text-white' : 'text-blue-100/70'}`} />
-                        <span className="text-sm font-bold">Recent Plans</span>
+                        <Briefcase className={`w-5 h-5 shrink-0 transition-colors ${activeTab === 'plans' ? 'text-white' : 'text-blue-100/70'}`} />
+                        <span className={`text-sm font-bold whitespace-nowrap transition-all duration-300 ease-in-out ${isDesktopSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden'}`}>Recent Plans</span>
                     </button>
 
                     <button
                         onClick={() => setActiveTab('mocks')}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${activeTab === 'mocks' ? 'bg-[#3B82F6] text-white shadow-md' : 'text-blue-100/70 hover:bg-white/10 hover:text-white'}`}
+                        className={`flex items-center px-4 py-3 rounded-xl transition-all duration-300 ${isDesktopSidebarOpen ? 'gap-3' : 'gap-0 justify-center'} ${activeTab === 'mocks' ? 'bg-[#3B82F6] text-white shadow-md' : 'text-blue-100/70 hover:bg-white/10 hover:text-white'}`}
+                        title={!isDesktopSidebarOpen ? "Mock Scores" : ""}
                     >
-                        <Trophy className={`w-5 h-5 ${activeTab === 'mocks' ? 'text-white' : 'text-blue-100/70'}`} />
-                        <span className="text-sm font-bold">Mock Scores</span>
+                        <Trophy className={`w-5 h-5 shrink-0 transition-colors ${activeTab === 'mocks' ? 'text-white' : 'text-blue-100/70'}`} />
+                        <span className={`text-sm font-bold whitespace-nowrap transition-all duration-300 ease-in-out ${isDesktopSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden'}`}>Mock Scores</span>
                     </button>
 
                     <button
                         onClick={() => setActiveTab('practices')}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${activeTab === 'practices' ? 'bg-[#3B82F6] text-white shadow-md' : 'text-blue-100/70 hover:bg-white/10 hover:text-white'}`}
+                        className={`flex items-center px-4 py-3 rounded-xl transition-all duration-300 ${isDesktopSidebarOpen ? 'gap-3' : 'gap-0 justify-center'} ${activeTab === 'practices' ? 'bg-[#3B82F6] text-white shadow-md' : 'text-blue-100/70 hover:bg-white/10 hover:text-white'}`}
+                        title={!isDesktopSidebarOpen ? "Practice Tests" : ""}
                     >
-                        <FileText className={`w-5 h-5 ${activeTab === 'practices' ? 'text-white' : 'text-blue-100/70'}`} />
-                        <span className="text-sm font-bold">Practice Tests</span>
+                        <FileText className={`w-5 h-5 shrink-0 transition-colors ${activeTab === 'practices' ? 'text-white' : 'text-blue-100/70'}`} />
+                        <span className={`text-sm font-bold whitespace-nowrap transition-all duration-300 ease-in-out ${isDesktopSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden'}`}>Practice Tests</span>
                     </button>
                 </nav>
 
-                <div className="p-5 border-t border-blue-800/30 bg-black/10">
-                    <div className="flex items-center justify-between px-2 py-1">
+                <div className="border-t border-blue-800/30 bg-black/10 p-5 flex items-center w-[288px] overflow-hidden">
+                    <div className="flex items-center justify-between px-1 w-full">
                         <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-full bg-[#3B82F6] flex items-center justify-center text-white font-bold text-xs shadow-inner uppercase">
+                            <div className="w-10 h-10 shrink-0 rounded-full bg-[#3B82F6] flex items-center justify-center text-white font-bold text-xs shadow-inner uppercase" title={user?.username || 'My Account'}>
                                 {user?.username?.charAt(0) || <User className="w-4 h-4" />}
                             </div>
-                            <div className="flex flex-col">
-                                <span className="text-sm font-bold text-white truncate max-w-[100px]">{user?.username || 'My Account'}</span>
+                            <div className={`flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${isDesktopSidebarOpen ? 'max-w-[150px] opacity-100' : 'max-w-0 opacity-0'}`}>
+                                <span className="text-sm font-bold text-white truncate">{user?.username || 'My Account'}</span>
                                 <span className="text-[10px] text-blue-200/80 font-semibold tracking-wide">Online</span>
                             </div>
                         </div>
-                        <button
-                            onClick={handleLogout}
-                            title="Logout"
-                            className="text-blue-200/70 hover:text-white hover:bg-rose-500/80 transition-colors p-2 rounded-lg"
-                        >
-                            <LogOut className="w-4 h-4" />
-                        </button>
+                        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isDesktopSidebarOpen ? 'max-w-[40px] opacity-100' : 'max-w-0 opacity-0'}`}>
+                            <button
+                                onClick={handleLogout}
+                                title="Logout"
+                                className="text-blue-200/70 hover:text-white hover:bg-rose-500/80 transition-colors p-2 rounded-lg"
+                            >
+                                <LogOut className="w-4 h-4 shrink-0" />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </aside>
@@ -219,10 +238,7 @@ const Home = () => {
                     {activeTab === 'create' && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex-1 flex flex-col justify-start">
                             <header className="max-w-2xl mx-auto text-center mb-4">
-                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-[#2563EB] mb-4 shadow-sm">
-                                    <Sparkles className="w-3 h-3 animate-pulse" />
-                                    <span className="text-[10px] font-bold uppercase tracking-widest">AI-Powered Strategy</span>
-                                </div>
+
                                 <h1 className="text-3xl md:text-4xl font-extrabold text-[#1F2937] tracking-tight leading-tight">
                                     Create Your Custom <br className="hidden md:block" />
                                     <span className="inline-block mt-2 px-4 py-1.5 bg-[#2563EB] text-white rounded-xl shadow-lg shadow-blue-500/30 transform -rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-300 cursor-default">
@@ -550,15 +566,7 @@ const Home = () => {
                         </div>
                     )}
 
-                    {/* Page Footer */}
-                    <footer className="mt-auto border-t border-[#E2E8F0] pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-[#6B7280]">
-                        <div className="flex gap-5">
-                            <a href="#" className="hover:text-[#6B7280] transition-colors">Privacy Policy</a>
-                            <a href="#" className="hover:text-[#6B7280] transition-colors">Terms of Service</a>
-                            <a href="#" className="hover:text-[#6B7280] transition-colors">Help Center</a>
-                        </div>
-                        <p>&copy; {new Date().getFullYear()} JobFit AI. All rights reserved.</p>
-                    </footer>
+
 
                 </div>
             </main>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { evaluateMockInterview } from '../services/interview.api.js';
-import { Play } from 'lucide-react';
+import { Play, ArrowLeft, ArrowRight, CheckCircle, Loader2, Mic, Square } from 'lucide-react';
 import RingLoader from '../../../components/RingLoader';
 
 const MockSimulator = () => {
@@ -104,8 +104,16 @@ const MockSimulator = () => {
       <div className="fixed top-1/3 right-10 w-80 h-80 bg-purple-600/10 rounded-full blur-[110px] pointer-events-none z-0" />
 
       <div className="relative z-10 w-full flex-1 flex flex-col px-4">
-        <div className="max-w-3xl mx-auto w-full my-10 p-8 bg-[#FFFFFF] rounded-2xl shadow-2xl border border-[#E2E8F0] backdrop-blur-xl">
-          
+        <div className="max-w-3xl mx-auto w-full mt-6 mb-2">
+            <button 
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[#2563EB] transition-colors bg-white/50 px-4 py-2 rounded-xl backdrop-blur-sm border border-slate-200/50 shadow-sm hover:shadow-md hover:bg-white w-fit"
+            >
+                <ArrowLeft className="w-4 h-4" /> Go Back
+            </button>
+        </div>
+        
+        <div className="max-w-3xl mx-auto w-full mb-10 p-8 bg-[#FFFFFF] rounded-2xl shadow-2xl border border-[#E2E8F0] backdrop-blur-xl">
           {/* Header Progress Bar */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex gap-2">
@@ -147,7 +155,17 @@ const MockSimulator = () => {
                       : "bg-[#FFFFFF] hover:bg-slate-50 text-[#1F2937] border-[#E2E8F0]"
                     }`}
                 >
-                  <span>{isListening ? "🛑 Stop Recording" : "🎤 Speak Answer"}</span>
+                  {isListening ? (
+                    <>
+                      <Square className="w-4 h-4 fill-current" />
+                      <span>Stop Recording</span>
+                    </>
+                  ) : (
+                    <>
+                      <Mic className="w-4 h-4" />
+                      <span>Speak Answer</span>
+                    </>
+                  )}
                 </button>
                 {isListening && (
                   <div className="flex gap-1">
@@ -173,20 +191,20 @@ const MockSimulator = () => {
             <button
               onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
               disabled={currentIndex === 0}
-              className={`px-5 py-2.5 font-bold rounded-lg text-sm transition-all duration-150 border ${currentIndex === 0
+              className={`px-5 py-2.5 font-bold rounded-lg text-sm transition-all duration-150 border flex items-center gap-2 ${currentIndex === 0
                   ? "bg-slate-50 text-[#9CA3AF] border-slate-100 cursor-not-allowed shadow-none"
                   : "bg-blue-50 hover:bg-blue-100 text-[#2563EB] border-blue-200 shadow-sm hover:shadow-md"
                 }`}
             >
-              ⬅️ Previous
+              <ArrowLeft className="w-4 h-4" /> Previous
             </button>
 
             {currentIndex < activeQuestions.length - 1 ? (
               <button
                 onClick={() => setCurrentIndex((prev) => prev + 1)}
-                className="px-6 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold rounded-lg text-sm shadow-md hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-150 hover:-translate-y-0.5"
+                className="px-6 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold rounded-lg text-sm shadow-md hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-150 hover:-translate-y-0.5 flex items-center gap-2"
               >
-                Next Question ➡️
+                Next Question <ArrowRight className="w-4 h-4" />
               </button>
             ) : (
               <button
@@ -194,7 +212,15 @@ const MockSimulator = () => {
                 disabled={isEvaluating}
                 className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-sm shadow-md hover:shadow-lg hover:shadow-emerald-500/30 transition-all duration-150 hover:-translate-y-0.5 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                {isEvaluating ? "Analyzing..." : "Submit Interview 🏁"}
+                {isEvaluating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Analyzing...
+                  </>
+                ) : (
+                  <>
+                    Submit Interview <CheckCircle className="w-4 h-4" />
+                  </>
+                )}
               </button>
             )}
           </div>

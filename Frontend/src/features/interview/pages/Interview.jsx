@@ -424,14 +424,7 @@ const Interview = () => {
                     </aside>
                 </div>
 
-                {/* Lower Layout Footer */}
-                <footer className="border-t border-[#E2E8F0] mt-6 pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#6B7280] font-semibold">
-                    <div className="flex gap-4">
-                        <a href="#" className="hover:text-[#1F2937] transition-colors">Privacy Policy</a>
-                        <a href="#" className="hover:text-[#1F2937] transition-colors">Terms of Service</a>
-                    </div>
-                    <p>&copy; {new Date().getFullYear()} AI Interview Prep Blueprint.</p>
-                </footer>
+
 
             </div>
             {/* Toast Notification */}

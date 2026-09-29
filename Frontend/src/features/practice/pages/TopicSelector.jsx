@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import AVAILABLE_TOPICS from "../data/topics.data";
 import { startPracticeSession } from "../services/practice.api";
+import { Rocket, Loader2 } from 'lucide-react';
 
 const TopicSelector = ({ onSessionStarted }) => {
   const [selectedTopics, setSelectedTopics] = useState([]);
@@ -132,12 +133,22 @@ const TopicSelector = ({ onSessionStarted }) => {
         <button
           onClick={handleStartSession}
           disabled={loading}
-          className={`px-8 py-3.5 text-white font-bold rounded-xl shadow-lg text-md transition-all duration-200 w-full sm:w-auto ${loading
+          className={`px-8 py-3.5 text-white font-bold rounded-xl shadow-lg text-md transition-all duration-200 w-full sm:w-auto flex items-center justify-center gap-2 mx-auto ${loading
             ? "bg-[#2563EB]/50 cursor-not-allowed opacity-70"
-            : "bg-[#2563EB] hover:bg-[#1D4ED8] hover:-translate-y-0.5 shadow-md"
+            : "bg-[#2563EB] hover:bg-[#1D4ED8] hover:-translate-y-0.5 shadow-md group"
             }`}
         >
-          {loading ? "Generating 10 Mixed Questions..." : "Start Practice Test 🚀"}
+          {loading ? (
+             <>
+               <Loader2 className="w-5 h-5 animate-spin" />
+               Generating 10 Mixed Questions...
+             </>
+          ) : (
+             <>
+               Start Practice Test
+               <Rocket className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+             </>
+          )}
         </button>
       </div>
     </div>
